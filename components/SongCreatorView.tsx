@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { suggestLyricsChujai, continueLyricsWithAI, polishLyricsWithAI } from '../geminiService';
-import { autoSaveMultipleSongsToLibrary, autoSaveSongToLibrary, getSavedSongsWithRecalled, SavedSong } from '../songs';
+import { autoSaveSongToLibrary, getSavedSongsWithRecalled, SavedSong } from '../songs';
 
 interface SongCreatorViewProps {
   initialData?: {
@@ -8,7 +8,7 @@ interface SongCreatorViewProps {
     title: string;
     genre: string;
   };
-  onPlay?: (title: string, artist: string, cover: string) => void;
+  onPlay?: (title: string, artist: string, cover: string, audioUrl?: string) => void;
   onOpenLyricStudio?: () => void;
 }
 
@@ -114,6 +114,9 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
     return saved;
   };
 
+  // Real AI generation: browser -> Netlify function -> Replicate MusicGen.
+  // The REPLICATE_API_TOKEN lives only in the Netlify function env; the
+  // browser never sees it. Progress shown below is real (create + poll).
   const handleGenerate = async () => {
     const finalTheme = theme.trim() || 'A heavy metalcore atmospheric anthem about memories fading';
     const finalTitle = title.trim() || 'Hurts Like Hell';
@@ -121,69 +124,146 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
 
     setIsProcessing(true);
 
-    const itemId1 = Math.random().toString();
-    const itemId2 = Math.random().toString();
-
-    const displayTitle1 = `${finalTitle} (Mix Alpha)`;
-    const displayTitle2 = `${finalTitle} (Mix Beta)`;
+    const itemId = Math.random().toString();
+    const coverId = Math.floor(Math.random() * 1000);
 
     setActiveQueueItems([
-      { id: itemId1, title: displayTitle1, progress: 12, stage: 'Voicing acoustic backing...', genre: finalGenre, coverId: Math.floor(Math.random() * 1000) },
-      { id: itemId2, title: displayTitle2, progress: 8, stage: 'Warming neural synthesizers...', genre: finalGenre, coverId: Math.floor(Math.random() * 1000) }
+      { id: itemId, title: finalTitle, progress: 4, stage: 'Sending to AI engine…', genre: finalGenre, coverId }
     ]);
 
-    const progInt = setInterval(() => {
-      setActiveQueueItems(prev => prev.map(item => ({
-        ...item,
-        progress: Math.min(item.progress + Math.floor(Math.random() * 15) + 8, 95),
-        stage: item.progress > 75 ? 'Polishing vocal harmonics...' : item.progress > 40 ? 'Calibrating guitar stems...' : item.stage
-      })));
-    }, 600);
+    const setQueueStage = (progress: number, stage: string) => {
+      setActiveQueueItems(prev =>
+        prev.map(item => (item.id === itemId ? { ...item, progress, stage } : item))
+      );
+    };
+
+    const failGeneration = (message: string) => {
+      setActiveQueueItems([]);
+      setIsProcessing(false);
+      setAutoSaveToast(`⚠️ ${message}`);
+      setTimeout(() => setAutoSaveToast(null), 7000);
+    };
+
+    const ENGINE_URL = '/.netlify/functions/generate-music';
 
     try {
-      const gLyrics = isCustom && lyrics.trim() ? lyrics : await suggestLyricsChujai(finalTheme, finalGenre);
-
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      clearInterval(progInt);
-
+      // Lyrics AI (text) stays exactly as before; a lyrics failure must not
+      // block the music itself.
+      let gLyrics: string;
+      try {
+        gLyrics = isCustom && lyrics.trim() ? lyrics : await suggestLyricsChujai(finalTheme, finalGenre);
+      } catch {
+        gLyrics = lyrics.trim() || '[Instrumental Track - Synthesized by SwCafe]';
+      }
       setLyrics(gLyrics);
       if (!title) setTitle(finalTitle);
 
-      // Auto-save every generated track immediately to persistent Library & Archive
-      const [track1, track2] = autoSaveMultipleSongsToLibrary([
-        {
-          title: displayTitle1,
-          genre: finalGenre,
-          lyrics: gLyrics,
-          theme: finalTheme,
-          engine: 'SwCafe v5.5'
-        },
-        {
-          title: displayTitle2,
-          genre: finalGenre,
-          lyrics: gLyrics,
-          theme: finalTheme,
-          engine: 'SwCafe v5.5'
-        }
-      ]);
+      // Build the music prompt from title + genre + description (+ lyric mood).
+      const lyricMood = (isCustom && lyrics.trim() ? lyrics : gLyrics)
+        .split('\n')
+        .filter(l => l.trim() && !l.trim().startsWith('['))
+        .slice(0, 4)
+        .join(' ');
+      const musicPrompt = `${finalTitle}. ${finalGenre} instrumental track. ${finalTheme}.${lyricMood ? ` Lyrical mood: ${lyricMood}` : ''}`.slice(0, 900);
 
-      setLocalLibrary(prev => [track1, track2, ...prev.filter(x => x.id !== track1.id && x.id !== track2.id)]);
-      setSelectedTrackId(track1.id);
+      // 1) Ask the function to start a MusicGen prediction.
+      setQueueStage(10, 'Sending to AI engine…');
+      let createRes: Response;
+      try {
+        createRes = await fetch(ENGINE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'create', prompt: musicPrompt, duration: 30 }),
+        });
+      } catch {
+        failGeneration('AI engine not connected — deploy to Netlify first (see DEPLOY.md)');
+        return;
+      }
+      if (createRes.status === 404) {
+        failGeneration('AI engine not connected — deploy to Netlify first (see DEPLOY.md)');
+        return;
+      }
+      const created = await createRes.json().catch(() => null);
+      if (!createRes.ok || !created?.id) {
+        failGeneration(created?.error || `AI engine error (${createRes.status}). Check REPLICATE_API_TOKEN in Netlify.`);
+        return;
+      }
+
+      // 2) Poll for completion: every 4s, up to 5 minutes.
+      setQueueStage(22, 'Composing your track… (this takes ~1–2 min)');
+      const deadline = Date.now() + 5 * 60 * 1000;
+      let pollCount = 0;
+      let audioUrl: string | null = null;
+
+      while (Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        pollCount += 1;
+        setQueueStage(Math.min(24 + pollCount * 2, 92), 'Composing your track… (this takes ~1–2 min)');
+
+        let statusRes: Response;
+        try {
+          statusRes = await fetch(ENGINE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'status', id: created.id }),
+          });
+        } catch {
+          failGeneration('Lost connection to the AI engine. Please try again.');
+          return;
+        }
+        const statusData = await statusRes.json().catch(() => null);
+        if (!statusRes.ok) {
+          failGeneration(statusData?.error || `AI engine error (${statusRes.status}).`);
+          return;
+        }
+
+        const st = statusData?.status;
+        if (st === 'succeeded') {
+          const out = statusData?.output;
+          audioUrl = Array.isArray(out) ? out[0] : out;
+          if (audioUrl) break;
+          failGeneration('The AI engine finished but returned no audio. Please try again.');
+          return;
+        }
+        if (st === 'failed' || st === 'canceled') {
+          failGeneration(statusData?.error || 'The AI engine could not finish this track. Try a different description.');
+          return;
+        }
+        // "starting" / "processing" — keep polling.
+      }
+
+      if (!audioUrl) {
+        failGeneration('Generation timed out after 5 minutes. Please try again.');
+        return;
+      }
+
+      // 3) Save the real track (with audio) and auto-play it in the Player.
+      setQueueStage(100, 'Finalizing…');
+      const track = autoSaveSongToLibrary({
+        title: finalTitle,
+        genre: finalGenre,
+        lyrics: gLyrics,
+        theme: finalTheme,
+        engine: 'MusicGen',
+        coverId,
+        audioUrl,
+      });
+
+      setLocalLibrary(prev => [track, ...prev.filter(x => x.id !== track.id)]);
+      setSelectedTrackId(track.id);
 
       setActiveQueueItems([]);
       setIsProcessing(false);
 
-      setAutoSaveToast(`💾 Auto-saved: "${displayTitle1}" and "${displayTitle2}" vaulted to Library!`);
+      setAutoSaveToast(`💾 Auto-saved: "${finalTitle}" vaulted to Library!`);
       setTimeout(() => setAutoSaveToast(null), 5500);
 
-      if (track1 && onPlay) {
-        onPlay(track1.title, 'SwCafe v5.5', `https://picsum.photos/seed/${track1.coverId}/200/200`);
+      if (onPlay) {
+        onPlay(track.title, 'MusicGen', `https://picsum.photos/seed/${track.coverId}/200/200`, audioUrl);
       }
     } catch (e) {
-      clearInterval(progInt);
-      setActiveQueueItems([]);
-      setIsProcessing(false);
-      alert('Neural synthesis timed out. Reconnecting SwCafe servers...');
+      console.error('Generation error:', e);
+      failGeneration('Something went wrong while generating. Please try again.');
     }
   };
 
@@ -644,7 +724,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (onPlay) onPlay(track.title, track.engine || 'SwCafe v5.5', `https://picsum.photos/seed/${track.coverId || 'art'}/200/200`);
+                              if (onPlay) onPlay(track.title, track.engine || 'SwCafe v5.5', `https://picsum.photos/seed/${track.coverId || 'art'}/200/200`, (track as SavedSong).audioUrl);
                             }}
                             className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                           >
@@ -741,7 +821,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
               <button 
                 onClick={() => {
                   if (onPlay && activeSelectedTrack) {
-                    onPlay(activeSelectedTrack.title, `SwCafe v5.5`, `https://picsum.photos/seed/${activeSelectedTrack.coverId || 'metal'}/200/200`);
+                    onPlay(activeSelectedTrack.title, `SwCafe v5.5`, `https://picsum.photos/seed/${activeSelectedTrack.coverId || 'metal'}/200/200`, (activeSelectedTrack as SavedSong).audioUrl);
                   }
                 }}
                 className="absolute inset-0 m-auto h-12 w-12 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white font-black text-xs scale-90 opacity-0 group-hover:opacity-100 transition-all hover:scale-100 flex items-center justify-center shadow-lg"

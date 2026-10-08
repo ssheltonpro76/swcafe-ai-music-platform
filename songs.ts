@@ -13,6 +13,7 @@ export interface SavedSong {
   remixCount?: number;
   playCount?: number;
   bpm?: number;
+  audioUrl?: string;
 }
 
 export const autoSaveSongToLibrary = (songData: Partial<SavedSong> & { title: string; genre?: string; lyrics?: string }): SavedSong => {
@@ -30,7 +31,8 @@ export const autoSaveSongToLibrary = (songData: Partial<SavedSong> & { title: st
     likesCount: songData.likesCount ?? 0,
     remixCount: songData.remixCount ?? (Math.floor(Math.random() * 8) + 1),
     playCount: songData.playCount ?? 1,
-    bpm: songData.bpm
+    bpm: songData.bpm,
+    audioUrl: songData.audioUrl
   };
 
   try {
