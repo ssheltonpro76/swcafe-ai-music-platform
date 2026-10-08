@@ -1,0 +1,10 @@
+{
+  "name": "SwCafe Business - AI Music Platform",
+  "description": "A professional-grade generative music creation and distribution platform featuring advanced AI vocal transformation, lyric writing studio, mastering tools, and enterprise licensing solutions.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
