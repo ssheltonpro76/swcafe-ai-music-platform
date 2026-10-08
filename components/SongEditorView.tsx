@@ -118,32 +118,32 @@ const SongEditorView: React.FC = () => {
       {/* Toggle Handle */}
       <button 
         onClick={() => setIsLabOpen(!isLabOpen)}
-        className={`absolute top-1/2 -translate-y-1/2 left-0 z-50 w-6 h-20 bg-[#111] border border-white/5 rounded-r-xl flex items-center justify-center text-[10px] hover:bg-white/5 transition-all shadow-2xl`}
+        className={`absolute top-1/2 -translate-y-1/2 left-0 z-50 w-6 h-20 bg-[#131316] border border-white/5 rounded-r-xl flex items-center justify-center text-[10px] hover:bg-white/5 transition-all shadow-2xl`}
       >
         {isLabOpen ? '◀' : '▶'}
       </button>
 
       {/* LEFT SIDEBAR: SONG LAB v4 CREATION HUB */}
-      <aside className={`transition-all duration-300 ease-in-out bg-[#111] border border-white/5 rounded-[2.5rem] flex flex-col overflow-hidden shadow-2xl relative ${isLabOpen ? 'w-[420px] p-8' : 'w-0 p-0 border-none'}`}>
+      <aside className={`transition-all duration-300 ease-in-out bg-[#131316] border border-white/5 rounded-[2.5rem] flex flex-col overflow-hidden shadow-2xl relative ${isLabOpen ? 'w-[420px] p-8' : 'w-0 p-0 border-none'}`}>
         <div className="min-w-[356px] flex flex-col h-full">
           <header className="space-y-4">
-            <h2 className="text-2xl font-black uppercase tracking-tighter italic">Song <span className="text-blue-500">Lab</span> v4</h2>
-            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
+            <h2 className="text-2xl font-semibold tracking-tight italic">Song <span className="text-orange-400">Lab</span> v4</h2>
+            <div className="flex bg-[#131316] p-1 rounded-xl border border-white/5">
                 {(['prompt', 'chujai', 'audio-hub', 'assistant'] as const).map((mode) => (
-                  <button key={mode} onClick={() => setActiveMode(mode)} className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeMode === mode ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}>{mode}</button>
+                  <button key={mode} onClick={() => setActiveMode(mode)} className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeMode === mode ? 'bg-white/10 text-white shadow-lg' : 'text-zinc-500 hover:text-white'}`}>{mode}</button>
                 ))}
             </div>
           </header>
           <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar mt-6 space-y-6">
-            <div className="px-3 py-2 bg-emerald-950/30 border border-emerald-500/20 rounded-xl flex items-center justify-between text-left">
-              <div className="flex items-center gap-1.5 font-bold text-[10px] text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div className="px-3 py-2 bg-orange-950/30 border border-orange-500/20 rounded-xl flex items-center justify-between text-left">
+              <div className="flex items-center gap-1.5 font-bold text-[10px] text-orange-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
                 <span>Auto-Save Active</span>
               </div>
-              <span className="text-[9px] text-emerald-400/80">Every song saved to Library</span>
+              <span className="text-[9px] text-orange-400/80">Every song saved to Library</span>
             </div>
-            <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Description..." className="w-full h-40 bg-black/40 border border-white/10 rounded-2xl p-5 text-sm outline-none" />
-            <button onClick={handleCreate} disabled={isGenerating} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl shadow-xl text-xs uppercase tracking-[0.3em] disabled:opacity-50">Synthesize</button>
+            <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Description..." className="w-full h-40 bg-[#131316] border border-white/10 rounded-2xl p-5 text-sm outline-none" />
+            <button onClick={handleCreate} disabled={isGenerating} className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:opacity-95 text-white font-black py-5 rounded-2xl shadow-xl text-xs uppercase tracking-[0.3em] disabled:opacity-50">Synthesize</button>
           </div>
         </div>
       </aside>
@@ -152,7 +152,7 @@ const SongEditorView: React.FC = () => {
       <main className="flex-1 flex flex-col gap-6 overflow-hidden">
         <header className="flex items-center justify-between px-4">
           <div className="flex gap-8">
-            <button className="text-sm font-black uppercase tracking-widest text-white border-b-2 border-blue-500 pb-2">Generation Feed</button>
+            <button className="text-sm font-black uppercase tracking-widest text-white border-b-2 border-orange-500 pb-2">Generation Feed</button>
           </div>
         </header>
         <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 pb-32">
@@ -164,11 +164,11 @@ const SongEditorView: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 animate-in slide-in-from-right-4 duration-500">
               {generations.map((gen) => (
-                <div key={gen.id} className="bg-[#111] border border-white/5 rounded-[2.5rem] p-6 flex gap-6 shadow-2xl">
+                <div key={gen.id} className="bg-[#1a1a1e] border border-white/5 rounded-[2.5rem] p-6 flex gap-6 shadow-2xl">
                   <div className="w-40 h-40 rounded-[2rem] overflow-hidden shrink-0"><img src={`https://picsum.photos/seed/${gen.coverId}/400/400`} className="w-full h-full object-cover" /></div>
                   <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
                     <h3 className="text-lg font-black uppercase truncate text-white">{gen.title}</h3>
-                    <p className="text-[10px] text-blue-400 font-bold uppercase">{gen.genre}</p>
+                    <p className="text-[10px] text-orange-400 font-bold uppercase">{gen.genre}</p>
                   </div>
                 </div>
               ))}

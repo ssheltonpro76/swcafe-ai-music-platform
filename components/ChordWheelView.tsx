@@ -86,13 +86,13 @@ const ChordWheelView: React.FC = () => {
     <div className="h-full flex flex-col gap-6 animate-in slide-in-from-bottom-8 duration-700 overflow-hidden pb-20">
       <header className="flex flex-col gap-6 bg-white/5 p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
         <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-black uppercase italic tracking-tighter">Production <span className="text-emerald-400">Center</span></h2>
-          <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5 overflow-x-auto custom-scrollbar no-scrollbar gap-1">
+          <h2 className="text-3xl font-semibold uppercase italic tracking-tight">Production <span className="text-orange-400">Center</span></h2>
+          <div className="flex bg-[#131316] p-1.5 rounded-2xl border border-white/5 overflow-x-auto custom-scrollbar no-scrollbar gap-1">
             {(['chord-wheel', 'maschine-plus', 'mpc-one-plus', 'maschine-3', 'mpc-software', 'kontakt-8', 'akai-expansions'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveSubTab(tab)}
-                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeSubTab === tab ? 'bg-white text-black shadow-xl scale-105' : 'text-slate-500 hover:text-white'}`}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeSubTab === tab ? 'bg-white text-black shadow-xl scale-105' : 'text-zinc-500 hover:text-white'}`}
               >
                 {tab === 'chord-wheel' ? 'Chord Wheel' : tab.replace('-', ' ').toUpperCase()}
               </button>
@@ -107,7 +107,7 @@ const ChordWheelView: React.FC = () => {
       </header>
 
       <div className="flex-1 flex gap-8 min-h-0 relative">
-        <div className="bg-[#0f0f0f] rounded-[3rem] border border-white/5 p-8 shadow-2xl flex flex-col items-center justify-center flex-1 relative overflow-hidden custom-scrollbar overflow-y-auto">
+        <div className="bg-[#131316] rounded-[3rem] border border-white/5 p-8 shadow-2xl flex flex-col items-center justify-center flex-1 relative overflow-hidden custom-scrollbar overflow-y-auto">
           
           {activeSubTab === 'chord-wheel' && (
             <div className="w-full h-full flex flex-col items-center justify-center animate-in zoom-in-95 duration-500">
@@ -120,7 +120,7 @@ const ChordWheelView: React.FC = () => {
 
           {/* NATIVE INSTRUMENTS MASCHINE+ HARDWARE UI */}
           {activeSubTab === 'maschine-plus' && (
-            <div className="w-full max-w-[1200px] bg-[#1a1a1a] p-8 rounded-3xl border-[4px] border-[#0a0a0a] shadow-[0_60px_150px_rgba(0,0,0,1)] flex flex-col gap-6 animate-in slide-in-from-bottom-10 duration-500">
+            <div className="w-full max-w-[1200px] bg-[#1a1a1e] p-8 rounded-3xl border-[4px] border-[#0a0a0a] shadow-[0_60px_150px_rgba(0,0,0,1)] flex flex-col gap-6 animate-in slide-in-from-bottom-10 duration-500">
                {/* Dual Screens Area */}
                <div className="flex gap-1.5 bg-[#0a0a0a] p-1.5 rounded-lg border border-black shadow-2xl">
                   {/* Left Screen: Browser */}
@@ -133,7 +133,7 @@ const ChordWheelView: React.FC = () => {
                     </div>
                     <div className="flex-1 space-y-2">
                        {['Midnight_Soul_Kit', 'Neon_Techno_v4', 'Ambient_Blue', 'Heavy_Grime'].map((item, idx) => (
-                         <div key={idx} className={`p-2.5 rounded text-[10px] font-bold tracking-tight flex items-center gap-3 ${idx === 1 ? 'bg-orange-500 text-black shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'text-white/40'}`}>
+                         <div key={idx} className={`p-2.5 rounded text-[10px] font-bold tracking-tight flex items-center gap-3 ${idx === 1 ? 'bg-orange-500 text-black shadow-black/40' : 'text-white/40'}`}>
                            <div className={`w-1.5 h-1.5 rounded-full ${idx === 1 ? 'bg-black' : 'bg-white/10'}`}></div>
                            {item}
                          </div>
@@ -160,7 +160,7 @@ const ChordWheelView: React.FC = () => {
                        </div>
                     </div>
                     <div className="mt-auto flex justify-between text-[9px] font-mono text-white/40">
-                       <span className="text-emerald-500">128.00 BPM</span>
+                       <span className="text-orange-400">128.00 BPM</span>
                        <span>1 / 4 BAR</span>
                     </div>
                   </div>
@@ -173,7 +173,7 @@ const ChordWheelView: React.FC = () => {
                        <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#333] to-[#111] border-2 border-black shadow-[0_10px_20px_rgba(0,0,0,0.5)] relative flex items-center justify-center cursor-pointer group active:rotate-12 transition-transform">
                           <div className="w-1 h-3 bg-white/20 rounded-full absolute top-1 group-hover:bg-orange-500"></div>
                        </div>
-                       <div className="bg-black/40 px-2 py-0.5 rounded border border-white/5">
+                       <div className="bg-[#131316] px-2 py-0.5 rounded border border-white/5">
                           <span className="text-[7px] font-black text-white/30 uppercase">{val}%</span>
                        </div>
                     </div>
@@ -198,7 +198,7 @@ const ChordWheelView: React.FC = () => {
                        <div className="bg-[#0a0a0a] p-4 rounded-xl border border-black grid grid-cols-2 gap-3">
                           <button className="h-10 bg-[#333] border-b-2 border-black rounded text-[8px] font-black text-white/60">RESTART</button>
                           <button className="h-10 bg-[#333] border-b-2 border-black rounded text-[8px] font-black text-white/60">ERASE</button>
-                          <button className="h-12 bg-emerald-900/30 border border-emerald-500/40 text-emerald-500 rounded text-[9px] font-black">PLAY</button>
+                          <button className="h-12 bg-orange-900/30 border border-orange-500/40 text-orange-400 rounded text-[9px] font-black">PLAY</button>
                           <button className="h-12 bg-red-900/30 border border-red-500/40 text-red-500 rounded text-[9px] font-black">REC</button>
                        </div>
                     </div>
@@ -227,7 +227,7 @@ const ChordWheelView: React.FC = () => {
 
                   {/* Right Navigation Cluster */}
                   <div className="w-56 flex flex-col gap-8">
-                     <div className="grid grid-cols-4 gap-1.5 bg-black/40 p-2 rounded-xl border border-white/5">
+                     <div className="grid grid-cols-4 gap-1.5 bg-[#131316] p-2 rounded-xl border border-white/5">
                         {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(b => (
                            <button key={b} onClick={() => setActiveBank(b)} className={`h-8 rounded-sm text-[9px] font-black transition-all ${activeBank === b ? 'bg-blue-500 text-white' : 'bg-[#333] text-white/20'}`}>{b}</button>
                         ))}
@@ -260,8 +260,8 @@ const ChordWheelView: React.FC = () => {
                      <span className="text-white/60 text-[10px] font-bold uppercase tracking-[0.4em]">Professional</span>
                   </div>
                </div>
-               <div className="h-[450px] bg-[#111] rounded-xl border-[8px] border-[#333] shadow-2xl relative flex flex-col overflow-hidden">
-                  <div className="bg-[#1a1a1a] h-14 flex items-center px-6 border-b border-black text-xs font-black text-white/30 gap-8">
+               <div className="h-[450px] bg-[#1a1a1e] rounded-xl border-[8px] border-[#333] shadow-2xl relative flex flex-col overflow-hidden">
+                  <div className="bg-[#1a1a1e] h-14 flex items-center px-6 border-b border-black text-xs font-black text-white/30 gap-8">
                      <span className="text-[#ef4444]">MAIN</span>
                      <span>BROWSE</span>
                      <span>STEP SEQ</span>
@@ -280,11 +280,11 @@ const ChordWheelView: React.FC = () => {
                     {['16 LVL', 'COPY', 'ERASE'].map(b => <button key={b} className="h-14 bg-[#333] border-b-4 border-black rounded-lg text-[8px] font-black text-white/50">{b}</button>)}
                   </div>
                   {/* 30% LARGER PADS per previous request */}
-                  <div className="bg-[#111] p-16 rounded-[3rem] border-[6px] border-black shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] grid grid-cols-4 gap-8 flex-1">
+                  <div className="bg-[#1a1a1e] p-16 rounded-[3rem] border-[6px] border-black shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] grid grid-cols-4 gap-8 flex-1">
                      {Array.from({length: 16}).map((_, i) => {
                        const padNum = 13 - (Math.floor(i / 4) * 4) + (i % 4);
                        return (
-                        <button key={i} onMouseDown={() => handlePadHit(i)} className={`aspect-square rounded-xl border-b-[8px] border-black/40 transition-all relative group ${activePad === i ? 'bg-white shadow-[0_0_60px_white] scale-90' : 'bg-[#1a1a1a] border-l-[6px] border-t-[6px] border-[#ef4444]40'}`}>
+                        <button key={i} onMouseDown={() => handlePadHit(i)} className={`aspect-square rounded-xl border-b-[8px] border-black/40 transition-all relative group ${activePad === i ? 'bg-white shadow-[0_0_60px_white] scale-90' : 'bg-[#1a1a1e] border-l-[6px] border-t-[6px] border-[#ef4444]40'}`}>
                            <span className="absolute bottom-2 right-2 text-[8px] font-black text-white/10">PAD {padNum}</span>
                         </button>
                        )
@@ -304,34 +304,34 @@ const ChordWheelView: React.FC = () => {
 
           {/* MPC SOFTWARE UI */}
           {activeSubTab === 'mpc-software' && (
-            <div className="w-full h-[750px] bg-[#1a1a1a] border border-white/10 rounded-2xl flex flex-col animate-in fade-in zoom-in-95 duration-500 shadow-[0_60px_120px_rgba(0,0,0,1)]">
+            <div className="w-full h-[750px] bg-[#1a1a1e] border border-white/10 rounded-2xl flex flex-col animate-in fade-in zoom-in-95 duration-500 shadow-[0_60px_120px_rgba(0,0,0,1)]">
                <div className="h-12 bg-[#2a2a2a] border-b border-black flex items-center justify-between px-6 shrink-0">
                   <div className="flex items-center gap-6">
                      <div className="text-sm font-black text-[#ef4444] italic">MPC <span className="text-white">SOFTWARE</span></div>
                      <div className="flex gap-4">
-                        {['FILE', 'EDIT', 'VIEW', 'TOOLS', 'HELP'].map(m => <button key={m} className="text-[9px] font-black text-slate-500 hover:text-white uppercase">{m}</button>)}
+                        {['FILE', 'EDIT', 'VIEW', 'TOOLS', 'HELP'].map(m => <button key={m} className="text-[9px] font-black text-zinc-500 hover:text-white uppercase">{m}</button>)}
                      </div>
                   </div>
-                  <div className="flex items-center gap-6 bg-black/40 px-6 h-full border-x border-black">
+                  <div className="flex items-center gap-6 bg-[#131316] px-6 h-full border-x border-black">
                      <div className="flex flex-col items-center">
-                        <span className="text-[7px] text-slate-500 font-black">BPM</span>
+                        <span className="text-[7px] text-zinc-500 font-black">BPM</span>
                         <span className="text-xs font-mono text-[#ef4444]">128.00</span>
                      </div>
                      <div className="flex flex-col items-center">
-                        <span className="text-[7px] text-slate-500 font-black">SEQ</span>
+                        <span className="text-[7px] text-zinc-500 font-black">SEQ</span>
                         <span className="text-xs font-mono text-white">01: SEQUENCE</span>
                      </div>
                   </div>
                   <div className="flex gap-2">
-                     <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div>
-                     <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Neural Link v4</span>
+                     <div className="w-3 h-3 rounded-full bg-orange-500 shadow-black/40"></div>
+                     <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Neural Link v4</span>
                   </div>
                </div>
 
                <div className="flex-1 flex overflow-hidden">
                   <div className="w-96 bg-[#222] border-r border-black flex flex-col">
                      <div className="p-4 border-b border-black space-y-4">
-                        <div className="flex justify-between items-center"><span className="text-[9px] font-black text-slate-500 uppercase">Input / Track</span></div>
+                        <div className="flex justify-between items-center"><span className="text-[9px] font-black text-zinc-500 uppercase">Input / Track</span></div>
                         <div className="bg-black/60 rounded-lg p-3 border border-white/5 space-y-2">
                            <div className="flex justify-between items-center">
                               <span className="text-[10px] font-black text-[#ef4444]">TRK 01</span>
@@ -353,15 +353,15 @@ const ChordWheelView: React.FC = () => {
                      </div>
                   </div>
 
-                  <div className="flex-1 bg-[#111] flex flex-col relative overflow-hidden">
-                     <header className="h-10 bg-[#1a1a1a] border-b border-black flex items-center px-6 gap-6">
+                  <div className="flex-1 bg-[#1a1a1e] flex flex-col relative overflow-hidden">
+                     <header className="h-10 bg-[#1a1a1e] border-b border-black flex items-center px-6 gap-6">
                         {['GRID', 'WAVE', 'LIST', 'STEP'].map(m => (
-                           <button key={m} className={`text-[9px] font-black uppercase tracking-widest ${m === 'WAVE' ? 'text-[#ef4444]' : 'text-slate-500 hover:text-white'}`}>{m}</button>
+                           <button key={m} className={`text-[9px] font-black uppercase tracking-widest ${m === 'WAVE' ? 'text-[#ef4444]' : 'text-zinc-500 hover:text-white'}`}>{m}</button>
                         ))}
                      </header>
                      <div className="flex-1 p-8 flex flex-col relative">
                         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-                        <div className="flex-1 bg-black/40 border border-white/5 rounded-2xl relative overflow-hidden flex items-center justify-center">
+                        <div className="flex-1 bg-[#131316] border border-white/5 rounded-2xl relative overflow-hidden flex items-center justify-center">
                            <svg className="w-full h-48 opacity-40" preserveAspectRatio="none">
                               <path d={`M 0 100 ${Array.from({length: 100}).map((_, j) => `L ${j*10} ${100 + (Math.random()-0.5)*150}`).join(' ')}`} fill="none" stroke="#ef4444" strokeWidth="2" />
                            </svg>
@@ -369,10 +369,10 @@ const ChordWheelView: React.FC = () => {
                      </div>
                   </div>
 
-                  <div className="w-80 bg-[#1a1a1a] border-l border-black flex flex-col">
+                  <div className="w-80 bg-[#1a1a1e] border-l border-black flex flex-col">
                      <header className="p-4 border-b border-black bg-black/20">
                         <div className="flex items-center justify-between">
-                           <span className="text-[10px] font-black text-slate-500 uppercase">Browser</span>
+                           <span className="text-[10px] font-black text-zinc-500 uppercase">Browser</span>
                         </div>
                      </header>
                      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -381,7 +381,7 @@ const ChordWheelView: React.FC = () => {
                               <img src={pack.cover} className="w-10 h-10 rounded-lg shadow-lg" alt={pack.name} />
                               <div className="min-w-0">
                                  <div className="text-[10px] font-black text-white truncate">{pack.name}</div>
-                                 <div className="text-[8px] text-slate-500 font-bold uppercase truncate">{pack.artist}</div>
+                                 <div className="text-[8px] text-zinc-500 font-bold uppercase truncate">{pack.artist}</div>
                               </div>
                            </button>
                         ))}
@@ -396,7 +396,7 @@ const ChordWheelView: React.FC = () => {
             <div className="w-full max-w-[1200px] space-y-8 animate-in fade-in duration-500">
                <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                     <h2 className="text-4xl font-black uppercase tracking-tighter italic">Akai <span className="text-[#ef4444]">Expansions</span></h2>
+                     <h2 className="text-4xl font-semibold uppercase tracking-tight italic">Akai <span className="text-[#ef4444]">Expansions</span></h2>
                   </div>
                </div>
                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -404,14 +404,14 @@ const ChordWheelView: React.FC = () => {
                      <div 
                         key={pack.id} 
                         onClick={() => setSelectedPack(pack.name)}
-                        className={`group relative aspect-square bg-[#111] rounded-[2.5rem] overflow-hidden border transition-all cursor-pointer shadow-2xl
+                        className={`group relative aspect-square bg-[#1a1a1e] rounded-[2.5rem] overflow-hidden border transition-all cursor-pointer shadow-2xl
                         ${selectedPack === pack.name ? 'border-[#ef4444] scale-[1.02]' : 'border-white/5 hover:border-white/20'}`}
                      >
                         <img src={pack.cover} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700" alt={pack.name} />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-8 flex flex-col justify-end">
                            <div className="space-y-1">
                               <h3 className="text-xl font-black uppercase text-white truncate leading-tight">{pack.name}</h3>
-                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{pack.artist}</p>
+                              <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">{pack.artist}</p>
                            </div>
                         </div>
                      </div>
@@ -422,8 +422,8 @@ const ChordWheelView: React.FC = () => {
 
           {/* KONTAKT 8 INTEGRATION */}
           {activeSubTab === 'kontakt-8' && (
-            <div className="w-full max-w-[1200px] h-[750px] bg-[#1a1a1a] border-[4px] border-[#333] rounded-xl flex overflow-hidden animate-in fade-in zoom-in-95 duration-500 shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
-               <div className="w-80 bg-[#111] border-r border-black flex flex-col">
+            <div className="w-full max-w-[1200px] h-[750px] bg-[#1a1a1e] border-[4px] border-[#333] rounded-xl flex overflow-hidden animate-in fade-in zoom-in-95 duration-500 shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
+               <div className="w-80 bg-[#1a1a1e] border-r border-black flex flex-col">
                   <header className="p-6 border-b border-white/5 flex items-center justify-between">
                      <span className="text-[10px] font-black tracking-[0.2em] text-orange-500">KONTAKT 8</span>
                      <span className="text-[8px] font-bold text-white/20">KOMPLETE 15</span>
@@ -436,22 +436,22 @@ const ChordWheelView: React.FC = () => {
                            className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${selectedLibrary === lib ? 'bg-orange-500/10 border border-orange-500/30' : 'hover:bg-white/5 border border-transparent'}`}
                         >
                            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded flex items-center justify-center text-xs shadow-lg">🎹</div>
-                           <span className={`text-[10px] font-black uppercase ${selectedLibrary === lib ? 'text-orange-400' : 'text-slate-500'}`}>{lib}</span>
+                           <span className={`text-[10px] font-black uppercase ${selectedLibrary === lib ? 'text-orange-400' : 'text-zinc-500'}`}>{lib}</span>
                         </button>
                      ))}
                   </div>
                </div>
 
                <div className="flex-1 flex flex-col bg-[#141414]">
-                  <header className="h-14 bg-black/40 border-b border-black flex items-center px-8 justify-between">
+                  <header className="h-14 bg-[#131316] border-b border-black flex items-center px-8 justify-between">
                      <div className="flex gap-6">
                         {['FILES', 'LIBRARIES', 'DATABASE', 'EXPERT', 'AUTOMATION'].map(h => (
-                           <button key={h} className="text-[9px] font-black text-slate-500 hover:text-white uppercase tracking-widest">{h}</button>
+                           <button key={h} className="text-[9px] font-black text-zinc-500 hover:text-white uppercase tracking-widest">{h}</button>
                         ))}
                      </div>
                      <div className="bg-black border border-white/5 px-4 py-1.5 rounded flex items-center gap-3">
                         <span className="text-[8px] font-black text-white/20">MEM</span>
-                        <span className="text-[9px] font-mono text-emerald-400">1.24 GB</span>
+                        <span className="text-[9px] font-mono text-orange-400">1.24 GB</span>
                      </div>
                   </header>
 
@@ -483,18 +483,18 @@ const ChordWheelView: React.FC = () => {
           {/* MASCHINE 3 INTEGRATION */}
           {activeSubTab === 'maschine-3' && (
             <div className="w-full max-w-[1250px] bg-[#121212] border-[1px] border-white/10 rounded-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 duration-500 shadow-[0_60px_150px_rgba(0,0,0,1)]">
-               <div className="h-16 bg-[#1a1a1a] border-b border-black flex items-center justify-between px-8 shrink-0">
+               <div className="h-16 bg-[#1a1a1e] border-b border-black flex items-center justify-between px-8 shrink-0">
                   <div className="flex items-center gap-8">
                      <span className="text-xl font-black italic text-white tracking-tighter">MASCHINE <span className="text-orange-500">3</span></span>
                   </div>
                </div>
 
                <div className="flex-1 flex min-h-0">
-                  <div className="w-64 bg-[#1a1a1a] border-r border-black p-6 space-y-8">
-                     <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5 pb-2">Group Focus</p>
+                  <div className="w-64 bg-[#1a1a1e] border-r border-black p-6 space-y-8">
+                     <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest border-b border-white/5 pb-2">Group Focus</p>
                      <div className="space-y-2">
                         {['Drums', 'Bass Synth', 'Melody A', 'Atmosphere'].map((grp, i) => (
-                           <div key={grp} className={`p-4 rounded-xl flex items-center justify-between transition-all ${i === 0 ? 'bg-blue-600/20 border border-blue-500/30' : 'bg-black/20 border border-transparent'}`}>
+                           <div key={grp} className={`p-4 rounded-xl flex items-center justify-between transition-all ${i === 0 ? 'bg-orange-600/20 border border-orange-500/30' : 'bg-black/20 border border-transparent'}`}>
                               <span className="text-[10px] font-black text-white">{grp}</span>
                            </div>
                         ))}
@@ -525,26 +525,26 @@ const ChordWheelView: React.FC = () => {
         </div>
 
         {/* Right Lab Output */}
-        <div className={`transition-all duration-300 ease-in-out bg-slate-900 rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl ${isMidiOpen ? 'w-[420px] p-8' : 'w-0 p-0 border-none'}`}>
+        <div className={`transition-all duration-300 ease-in-out bg-[#131316] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl ${isMidiOpen ? 'w-[420px] p-8' : 'w-0 p-0 border-none'}`}>
           <div className="min-w-[356px] flex flex-col h-full gap-8">
              <div className="flex justify-between items-center">
                 <h3 className="text-xs font-black uppercase tracking-widest text-indigo-400">MIDI Lab Output</h3>
                 {isThinking && <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>}
              </div>
              
-             <div className="flex-1 bg-black/40 rounded-3xl p-6 border border-white/5 overflow-y-auto custom-scrollbar">
+             <div className="flex-1 bg-[#131316] rounded-3xl p-6 border border-white/5 overflow-y-auto custom-scrollbar">
                 {selectedChord && (
                   <div className="mb-6 pb-6 border-b border-white/5">
-                    <p className="text-[10px] font-black uppercase text-slate-500 mb-2">Active Session Chord</p>
+                    <p className="text-[10px] font-black uppercase text-zinc-500 mb-2">Active Session Chord</p>
                     <h4 className="text-4xl font-black text-[#FF6B6B]">{selectedChord}</h4>
                   </div>
                 )}
                 
                 <div className="space-y-6">
                    <div>
-                      <p className="text-[10px] font-black uppercase text-slate-500 mb-3">AI Progression Advice</p>
+                      <p className="text-[10px] font-black uppercase text-zinc-500 mb-3">AI Progression Advice</p>
                       {aiAdvice ? (
-                        <p className="text-[11px] leading-relaxed text-slate-300 italic animate-in fade-in duration-700">"{aiAdvice}"</p>
+                        <p className="text-[11px] leading-relaxed text-zinc-300 italic animate-in fade-in duration-700">"{aiAdvice}"</p>
                       ) : (
                         <div className="py-12 flex flex-col items-center justify-center opacity-20 text-center gap-4">
                            <span className="text-4xl">🧠</span>
@@ -555,8 +555,8 @@ const ChordWheelView: React.FC = () => {
 
                    {midiData && (
                      <div className="pt-6 border-t border-white/5 animate-in slide-in-from-bottom-2">
-                        <p className="text-[10px] font-black uppercase text-emerald-400 mb-3">MIDI Event Log</p>
-                        <div className="bg-black/60 rounded-xl p-4 border border-emerald-500/20 font-mono text-[9px] text-emerald-400/80 whitespace-pre-wrap max-h-40 overflow-y-auto custom-scrollbar">
+                        <p className="text-[10px] font-black uppercase text-orange-400 mb-3">MIDI Event Log</p>
+                        <div className="bg-black/60 rounded-xl p-4 border border-orange-500/20 font-mono text-[9px] text-orange-400/80 whitespace-pre-wrap max-h-40 overflow-y-auto custom-scrollbar">
                            {midiData}
                         </div>
                      </div>
@@ -566,13 +566,13 @@ const ChordWheelView: React.FC = () => {
 
              <div className="space-y-4">
                 <div className="space-y-2">
-                   <p className="text-[9px] font-black uppercase text-slate-600 tracking-widest px-1">Pattern Algorithm</p>
+                   <p className="text-[9px] font-black uppercase text-zinc-600 tracking-widest px-1">Pattern Algorithm</p>
                    <div className="grid grid-cols-2 gap-2">
                       {['Arpeggio', 'Block Chords', 'Neo-Soul Vibe', 'Dark Techno'].map(p => (
                         <button 
                           key={p} 
                           onClick={() => setActivePattern(p)}
-                          className={`py-2.5 rounded-xl text-[8px] font-black uppercase border transition-all ${activePattern === p ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-white/5 border-white/5 text-slate-500 hover:border-white/20'}`}
+                          className={`py-2.5 rounded-xl text-[8px] font-black uppercase border transition-all ${activePattern === p ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-white/5 border-white/5 text-zinc-500 hover:border-white/20'}`}
                         >
                           {p}
                         </button>

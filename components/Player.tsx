@@ -15,7 +15,7 @@ const Player: React.FC<PlayerProps> = ({ track }) => {
   const [isMuted, setIsMuted] = useState(false);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 h-24 bg-[#07080c] border-t border-[#1e202b] px-8 flex items-center justify-between z-50 shadow-2xl select-none text-slate-200">
+    <footer className="fixed bottom-0 left-0 right-0 h-20 bg-[#0a0a0b]/95 backdrop-blur-md border-t border-white/5 px-6 flex items-center justify-between z-50 shadow-2xl select-none text-zinc-200">
       {/* Left section: Track Info */}
       <div className="flex items-center gap-4 w-1/3">
         <div className="relative group cursor-pointer overflow-hidden rounded-xl">
@@ -29,10 +29,10 @@ const Player: React.FC<PlayerProps> = ({ track }) => {
           </div>
         </div>
         <div className="min-w-0">
-          <h4 className="text-sm font-black tracking-tight truncate text-white hover:text-[#ff5e00] cursor-pointer transition-colors">
+          <h4 className="text-sm font-semibold tracking-tight truncate text-white hover:text-orange-400 cursor-pointer transition-colors">
             {track.title}
           </h4>
-          <p className="text-xs font-semibold text-slate-400 hover:text-slate-300 cursor-pointer truncate mt-0.5">
+          <p className="text-xs font-medium text-zinc-400 hover:text-zinc-300 cursor-pointer truncate mt-0.5">
             {track.artist}
           </p>
         </div>
@@ -46,45 +46,44 @@ const Player: React.FC<PlayerProps> = ({ track }) => {
       </div>
 
       {/* Middle section: Playback Controls */}
-      <div className="flex flex-col items-center gap-2.5 w-1/3">
+      <div className="flex flex-col items-center gap-2 w-1/3">
         <div className="flex items-center gap-6">
-          <button className="text-slate-400 hover:text-white text-sm transition-colors" title="Shuffle">🔀</button>
-          <button className="text-lg text-slate-400 hover:text-white transition-colors" title="Previous">⏮</button>
+          <button className="text-zinc-500 hover:text-white text-sm transition-colors" title="Shuffle">🔀</button>
+          <button className="text-lg text-zinc-400 hover:text-white transition-colors" title="Previous">⏮</button>
           <button 
             onClick={() => setIsPlaying(!isPlaying)}
-            className="w-11 h-11 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 hover:bg-slate-100 transition-all active:scale-95 shadow-lg relative group overflow-hidden"
+            className="w-11 h-11 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-all active:scale-95 shadow-lg relative group overflow-hidden"
           >
             <span className="text-sm font-black select-none -mr-0.5 z-10">
               {isPlaying ? '⏸' : '▶'}
             </span>
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#ff5e00]/10 to-[#ffb700]/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </button>
-          <button className="text-lg text-slate-400 hover:text-white transition-colors" title="Next">⏭</button>
-          <button className="text-slate-400 hover:text-white text-sm transition-colors" title="Repeat">🔁</button>
+          <button className="text-lg text-zinc-400 hover:text-white transition-colors" title="Next">⏭</button>
+          <button className="text-zinc-500 hover:text-white text-sm transition-colors" title="Repeat">🔁</button>
         </div>
         <div className="w-full flex items-center gap-3">
-          <span className="text-[10px] font-bold tracking-tight tabular-nums text-slate-500">1:24</span>
-          <div className="flex-1 h-1 bg-zinc-800 rounded-full cursor-pointer relative group">
+          <span className="text-[10px] font-medium tracking-tight tabular-nums text-zinc-500">1:24</span>
+          <div className="flex-1 h-1 bg-white/10 rounded-full cursor-pointer relative group">
             <div 
-              className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-[#ff5e00] to-[#ff9100] w-[40%] rounded-full group-hover:shadow-[0_0_12px_rgba(255,94,0,0.6)]"
+              className="absolute top-0 left-0 bottom-0 bg-gradient-to-r from-orange-500 to-red-500 w-[40%] rounded-full"
               style={{ transition: 'width 0.3s ease' }}
             ></div>
             <div className="absolute top-1/2 -translate-y-1/2 left-[40%] w-2.5 h-2.5 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow transition-opacity"></div>
           </div>
-          <span className="text-[10px] font-bold tracking-tight tabular-nums text-slate-500">3:45</span>
+          <span className="text-[10px] font-medium tracking-tight tabular-nums text-zinc-500">3:45</span>
         </div>
       </div>
 
       {/* Right section: Master Volume & Display Toggles */}
       <div className="flex items-center justify-end gap-5 w-1/3">
-        <button className="text-slate-400 hover:text-white transition-colors" title="Show Lyrics">🎙️ Lyrics</button>
-        <button className="text-slate-400 hover:text-white transition-colors" title="Remix and Variation">🎚️ Remix</button>
+        <button className="text-zinc-400 hover:text-white transition-colors" title="Show Lyrics">🎙️ Lyrics</button>
+        <button className="text-zinc-400 hover:text-white transition-colors" title="Remix and Variation">🎚️ Remix</button>
         <div className="flex items-center gap-2 w-28">
-          <button onClick={() => setIsMuted(!isMuted)} className="text-slate-400 hover:text-white transition-colors">
+          <button onClick={() => setIsMuted(!isMuted)} className="text-zinc-400 hover:text-white transition-colors">
             {isMuted ? '🔇' : '🔊'}
           </button>
-          <div className="flex-1 h-1 bg-zinc-800 rounded-full cursor-pointer group relative">
-            <div className={`h-full rounded-full bg-slate-400 group-hover:bg-[#ff5e00] transition-colors ${isMuted ? 'w-0' : 'w-[70%]'}`}></div>
+          <div className="flex-1 h-1 bg-white/10 rounded-full cursor-pointer group relative">
+            <div className={`h-full rounded-full bg-zinc-400 group-hover:bg-orange-500 transition-colors ${isMuted ? 'w-0' : 'w-[70%]'}`}></div>
             <div className={`absolute top-1/2 -translate-y-1/2 left-[70%] w-2.5 h-2.5 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow transition-opacity ${isMuted && 'hidden'}`}></div>
           </div>
         </div>

@@ -422,16 +422,16 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#070709] text-[#e0e0e0] font-sans select-none overflow-hidden text-left relative">
+    <div className="h-full flex flex-col bg-[#0a0a0b] text-[#e0e0e0] font-sans select-none overflow-hidden text-left relative">
       
       {/* Real-time Studio Auto-Save Toast Alert */}
       {studioAutoSaveToast && (
-        <div className="fixed top-5 right-6 z-50 bg-[#121217] border border-emerald-500/50 text-emerald-300 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold animate-in slide-in-from-top-3 backdrop-blur-md">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div className="fixed top-5 right-6 z-50 bg-[#131316] border border-orange-500/50 text-orange-300 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold animate-in slide-in-from-top-3 backdrop-blur-md">
+          <span className="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
           <span>{studioAutoSaveToast}</span>
           <button 
             onClick={() => setStudioAutoSaveToast(null)} 
-            className="ml-2 text-slate-400 hover:text-white text-sm"
+            className="ml-2 text-zinc-400 hover:text-white text-sm"
           >
             ✕
           </button>
@@ -439,29 +439,29 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
       )}
 
       {/* 1. TOP HEADER APP BAR (SUNO Studio Redesign style) */}
-      <div className="h-12 bg-[#090a10] border-b border-[#13141a] flex items-center justify-between px-4 z-40 shrink-0">
+      <div className="h-12 bg-[#131316] border-b border-white/5 flex items-center justify-between px-4 z-40 shrink-0">
         <div className="flex items-center gap-2.5">
           {/* Logo brand */}
           <div className="flex items-center gap-1.5 cursor-pointer">
             <h1 className="text-sm font-extrabold tracking-[0.22em] text-white uppercase font-mono my-0 flex items-center gap-1.5">
-              <span className="text-[#ff5e00] text-base">☕</span>
+              <span className="text-orange-400 text-base">☕</span>
               swcafe studio
             </h1>
-            <span className="text-[9px] bg-[#1a1c24] text-slate-400 font-extrabold px-1.5 py-0.5 rounded border border-white/5 font-mono">1.2</span>
+            <span className="text-[9px] bg-[#1a1c24] text-zinc-400 font-extrabold px-1.5 py-0.5 rounded border border-white/5 font-mono">1.2</span>
           </div>
 
-          <div className="h-4 w-px bg-zinc-800/80 mx-2"></div>
+          <div className="h-4 w-px bg-white/10 mx-2"></div>
 
           {/* Prompt Mode Pill Selection */}
-          <div className="flex bg-[#111218] p-0.5 rounded-lg border border-white/5">
+          <div className="flex bg-[#1a1a1e] p-0.5 rounded-lg border border-white/5">
             {(['Simple', 'Advanced', 'Sounds'] as const).map(mode => (
               <button
                 key={mode}
                 onClick={() => setActiveMode(mode)}
                 className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${
                   activeMode === mode
-                    ? 'bg-zinc-800 text-[#ff5e00] shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white/10 text-orange-400 shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 {mode}
@@ -473,7 +473,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
           <select 
             value={activeVersion}
             onChange={(e) => setActiveVersion(e.target.value)}
-            className="bg-[#111218] border border-white/5 rounded-lg px-2 py-1 text-[10px] font-bold text-slate-300 pointer-events-auto outline-none cursor-pointer focus:border-[#ff5e00]/40"
+            className="bg-[#1a1a1e] border border-white/5 rounded-lg px-2 py-1 text-[10px] font-bold text-zinc-300 pointer-events-auto outline-none cursor-pointer focus:border-orange-500/40"
           >
             <option value="v5.5">v5.5 Premier</option>
             <option value="v5">v5 Standard</option>
@@ -482,12 +482,12 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
         </div>
 
         {/* Center top-transport active song block */}
-        <div className="hidden md:flex items-center gap-3 bg-[#111218] border border-white/5 py-1 px-3.5 rounded-full shadow-inner max-w-sm">
+        <div className="hidden md:flex items-center gap-3 bg-[#1a1a1e] border border-white/5 py-1 px-3.5 rounded-full shadow-inner max-w-sm">
           <div className="h-4.5 w-4.5 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex-shrink-0 animate-pulse"></div>
           <span className="text-[10px] font-black tracking-wide text-white font-mono uppercase truncate">
-            {isPlaying ? '● On Air:' : '■ Idle:'} <span className="text-amber-400">{songTitle || 'Untitled Tape'}</span>
+            {isPlaying ? '● On Air:' : '■ Idle:'} <span className="text-orange-400">{songTitle || 'Untitled Tape'}</span>
           </span>
-          <span className="text-[8px] bg-[#ff5e00]/15 text-[#ff731d] px-1.5 my-0.5 rounded uppercase font-bold tracking-widest font-mono">
+          <span className="text-[8px] bg-orange-500/15 text-orange-400 px-1.5 my-0.5 rounded uppercase font-bold tracking-widest font-mono">
             {bpm} BPM
           </span>
         </div>
@@ -495,16 +495,16 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
         {/* Right Help / Learn actions */}
         <div className="flex items-center gap-2">
           {/* Studio Auto-Save active status */}
-          <div className="hidden sm:flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/40 border border-emerald-500/25 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div className="hidden sm:flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/40 border border-orange-500/25 px-2.5 py-1 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
             <span>Auto-Save Active</span>
           </div>
 
           <button 
             onClick={() => alert(`🎹 Welcome to SwCafe Studio DAW v1.2!\n• Click "+ Audio" or "Inspo" on the left to preset lyrics & style.\n• Click the glowing "Create" button to compile stems.\n• Every song generated is automatically saved to your Library!\n• Use the bottom player grid to play, loop, adjust BPM, and solo different multitrack stems!`)}
-            className="h-8 px-3 rounded-lg bg-[#111218] hover:bg-zinc-800 border border-white/5 flex items-center gap-1.5 text-[10px] font-bold text-slate-300 transition-colors"
+            className="h-8 px-3 rounded-lg bg-[#1a1a1e] hover:bg-white/10 border border-white/5 flex items-center gap-1.5 text-[10px] font-bold text-zinc-300 transition-colors"
           >
-            <HelpCircle size={12} className="text-slate-400" />
+            <HelpCircle size={12} className="text-zinc-400" />
             <span>Learn</span>
           </button>
 
@@ -519,7 +519,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="h-8 px-3 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-[10px] uppercase flex items-center gap-1 shadow-sm transition-all shadow-blue-900/10"
+            className="h-8 px-3 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-[10px] uppercase flex items-center gap-1 shadow-sm transition-all shadow-black/40"
           >
             <Download size={11} />
             <span>Export</span>
@@ -531,24 +531,24 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
       <div className="flex-1 flex overflow-hidden min-h-0 relative">
         
         {/* PANEL A: LEFT WORKBENCH SIDEBAR (lyrics, styles, settings) */}
-        <div className="w-[280px] border-r border-[#13141a] bg-[#090a0f] flex flex-col shrink-0 min-h-0 z-30">
+        <div className="w-[280px] border-r border-white/5 bg-[#131316] flex flex-col shrink-0 min-h-0 z-30">
           
           {/* Quick Action Top buttons */}
-          <div className="p-3 border-b border-zinc-900 flex gap-1.5 shrink-0">
+          <div className="p-3 border-b border-white/5 flex gap-1.5 shrink-0">
             <button 
               onClick={() => {
                 setSongTitle("Acoustic Twilight Rain");
                 setStylePrompt("slow moody cinematic acoustics, soft nylon guitar, ambient rainy drone, warm sub");
                 setLyricsText("[Verse 1]\nRaindrops gather on the rusty steel frame\nWhispering secrets I can no longer name\nLet the sound of the acoustic loop flow...");
               }}
-              className="flex-1 py-1.5 bg-[#121319] hover:bg-zinc-800 border border-white/5 rounded-lg text-[9px] font-black uppercase text-amber-500 tracking-wider flex items-center justify-center gap-1 transition-all"
+              className="flex-1 py-1.5 bg-[#1a1a1e] hover:bg-white/10 border border-white/5 rounded-lg text-[9px] font-black uppercase text-orange-400 tracking-wider flex items-center justify-center gap-1 transition-all"
             >
               <Music size={10} />
               <span>+ Audio</span>
             </button>
             <button 
               onClick={onOpenVoice}
-              className="flex-1 py-1.5 bg-[#121319] hover:bg-zinc-800 border border-white/5 rounded-lg text-[9px] font-black uppercase text-[#ec4899] tracking-wider flex items-center justify-center gap-1 transition-all relative"
+              className="flex-1 py-1.5 bg-[#1a1a1e] hover:bg-white/10 border border-white/5 rounded-lg text-[9px] font-black uppercase text-[#ec4899] tracking-wider flex items-center justify-center gap-1 transition-all relative"
             >
               <span className="absolute -top-1 -right-1 bg-pink-500 text-white font-black text-[6px] px-1 rounded-full animate-bounce">New</span>
               <span>+ Voice</span>
@@ -558,7 +558,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                 setStylePrompt("gothic dark electro punk, distortion drums, high gain fuzzy bass, modular sweeps");
                 setSongTitle("Goth Industrial Grind");
               }}
-              className="flex-1 py-1.5 bg-[#121319] hover:bg-zinc-800 border border-white/5 rounded-lg text-[9px] font-black uppercase text-cyan-400 tracking-wider flex items-center justify-center gap-1 transition-all"
+              className="flex-1 py-1.5 bg-[#1a1a1e] hover:bg-white/10 border border-white/5 rounded-lg text-[9px] font-black uppercase text-cyan-400 tracking-wider flex items-center justify-center gap-1 transition-all"
             >
               <Sparkles size={10} />
               <span>Inspo</span>
@@ -569,22 +569,22 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
           <div className="flex-1 overflow-y-auto p-3.5 space-y-4 text-left custom-scrollbar">
             
             {/* Folder 1: Lyrics Configuration */}
-            <div className="space-y-2 border-b border-zinc-900/60 pb-3">
+            <div className="space-y-2 border-b border-white/5 pb-3">
               <div 
                 onClick={() => setIsLyricsOpen(!isLyricsOpen)}
-                className="flex items-center justify-between cursor-pointer select-none py-1 text-slate-400 hover:text-white"
+                className="flex items-center justify-between cursor-pointer select-none py-1 text-zinc-400 hover:text-white"
               >
                 <span className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  <span className="text-slate-500 text-[8px]">{isLyricsOpen ? '▼' : '▶'}</span>
+                  <span className="text-zinc-500 text-[8px]">{isLyricsOpen ? '▼' : '▶'}</span>
                   Lyrics
                 </span>
-                <span className="text-[8px] font-mono font-bold text-slate-500">Ctrl+L</span>
+                <span className="text-[8px] font-mono font-bold text-zinc-500">Ctrl+L</span>
               </div>
 
               {isLyricsOpen && (
                 <div className="space-y-2.5 pt-1 animate-in fade-in-50">
                   {/* Lyrics mini tabs */}
-                  <div className="flex bg-[#111218] p-0.5 rounded-md border border-white/5">
+                  <div className="flex bg-[#1a1a1e] p-0.5 rounded-md border border-white/5">
                     {(['Write', 'Prompt', 'Instrumental'] as const).map(tab => (
                       <button
                         key={tab}
@@ -596,8 +596,8 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         }}
                         className={`flex-1 py-1 text-[9px] font-black uppercase tracking-wider rounded transition-all ${
                           lyricsType === tab
-                            ? 'bg-zinc-800 text-amber-500'
-                            : 'text-slate-500 hover:text-slate-300'
+                            ? 'bg-white/10 text-orange-400'
+                            : 'text-zinc-500 hover:text-zinc-300'
                         }`}
                       >
                         {tab}
@@ -606,12 +606,12 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   </div>
 
                   {/* Lyrics Text Box container matching mockup exactly */}
-                  <div className="relative border border-zinc-900 bg-[#0c0d12] rounded-xl overflow-hidden focus-within:border-[#ff5e00]/30 transition-all">
+                  <div className="relative border border-white/5 bg-[#131316] rounded-xl overflow-hidden focus-within:border-orange-500/30 transition-all">
                     <textarea
                       value={lyricsText}
                       onChange={(e) => setLyricsText(e.target.value)}
                       disabled={lyricsType === 'Instrumental'}
-                      className="w-full h-28 bg-transparent p-3 font-sans text-xs text-slate-300 leading-normal focus:outline-none resize-none custom-scrollbar custom-placeholder"
+                      className="w-full h-28 bg-transparent p-3 font-sans text-xs text-zinc-300 leading-normal focus:outline-none resize-none custom-scrollbar custom-placeholder"
                       style={{ caretColor: '#ff5e00' }}
                     />
                     
@@ -621,25 +621,25 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         <button 
                           onClick={handleLyricsAutogen}
                           title="Generate high-craft lyrics" 
-                          className="p-1.5 rounded-md hover:bg-zinc-800 text-slate-400 hover:text-[#ff5e00] transition-colors"
+                          className="p-1.5 rounded-md hover:bg-white/10 text-zinc-400 hover:text-orange-400 transition-colors"
                         >
                           <Sparkles size={11} />
                         </button>
                         <button 
                           onClick={() => alert(`💡 Tip: Insert labels like [Chorus], [Verse], [Drop], [Heavy Riff] to guide neural AI track generation layers.`)}
-                          className="p-1.5 rounded-md hover:bg-zinc-800 text-slate-400 hover:text-white transition-colors"
+                          className="p-1.5 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
                         >
                           <SlidersHorizontal size={11} />
                         </button>
                       </div>
-                      <span className="text-[9px] text-slate-600 font-mono">
+                      <span className="text-[9px] text-zinc-600 font-mono">
                         {lyricsText ? lyricsText.length : 0} chr
                       </span>
                     </div>
                   </div>
                   
                   {generatedLyricsLog && (
-                    <p className="text-[9px] text-[#ff7a29] font-semibold italic mt-1 leading-snug">
+                    <p className="text-[9px] text-orange-400 font-semibold italic mt-1 leading-snug">
                       {generatedLyricsLog}
                     </p>
                   )}
@@ -648,16 +648,16 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
             </div>
 
             {/* Folder 2: Styles Selection */}
-            <div className="space-y-2 border-b border-zinc-900/60 pb-3">
+            <div className="space-y-2 border-b border-white/5 pb-3">
               <div 
                 onClick={() => setIsStylesOpen(!isStylesOpen)}
-                className="flex items-center justify-between cursor-pointer select-none py-1 text-slate-400 hover:text-white"
+                className="flex items-center justify-between cursor-pointer select-none py-1 text-zinc-400 hover:text-white"
               >
                 <span className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  <span className="text-slate-500 text-[8px]">{isStylesOpen ? '▼' : '▶'}</span>
+                  <span className="text-zinc-500 text-[8px]">{isStylesOpen ? '▼' : '▶'}</span>
                   Styles
                 </span>
-                <span className="text-[8px] font-mono font-bold text-slate-500">Ctrl+S</span>
+                <span className="text-[8px] font-mono font-bold text-zinc-500">Ctrl+S</span>
               </div>
 
               {isStylesOpen && (
@@ -667,7 +667,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                     value={stylePrompt}
                     onChange={(e) => setStylePrompt(e.target.value)}
                     placeholder="bolero, fast-paced beats, speech, ritmo..."
-                    className="w-full bg-[#0c0d12] border border-zinc-900 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#ff5e00]/35 transition-all font-mono"
+                    className="w-full bg-[#131316] border border-white/5 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/35 transition-all font-mono"
                   />
                   
                   {/* Preset quick pills */}
@@ -686,8 +686,8 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                           }}
                           className={`px-2 py-0.5 rounded-full text-[9px] font-bold transition-all border ${
                             isActive
-                              ? 'bg-[#ff5e00]/10 text-[#ff5e00] border-[#ff5e00]/25'
-                              : 'bg-[#111218] text-slate-400 border-white/5 hover:text-white'
+                              ? 'bg-orange-500/10 text-orange-400 border-orange-500/25'
+                              : 'bg-[#1a1a1e] text-zinc-400 border-white/5 hover:text-white'
                           }`}
                         >
                           {pill}
@@ -700,13 +700,13 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
             </div>
 
             {/* Folder 3: More Options fold (tempo limits, key bindings) */}
-            <div className="space-y-2 border-b border-zinc-900/60 pb-3">
+            <div className="space-y-2 border-b border-white/5 pb-3">
               <div 
                 onClick={() => setIsOptionsOpen(!isOptionsOpen)}
-                className="flex items-center justify-between cursor-pointer select-none py-1 text-slate-400 hover:text-white"
+                className="flex items-center justify-between cursor-pointer select-none py-1 text-zinc-400 hover:text-white"
               >
                 <span className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  <span className="text-slate-500 text-[8px]">{isOptionsOpen ? '▼' : '▶'}</span>
+                  <span className="text-zinc-500 text-[8px]">{isOptionsOpen ? '▼' : '▶'}</span>
                   More Options
                 </span>
               </div>
@@ -714,7 +714,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               {isOptionsOpen && (
                 <div className="space-y-3 pt-1 text-left animate-in fade-in-50">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Selected BPM</label>
+                    <label className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-widest">Selected BPM</label>
                     <div className="flex gap-2">
                       <input 
                         type="range" 
@@ -724,16 +724,16 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         onChange={(e) => setBpm(parseInt(e.target.value))}
                         className="flex-1 accent-[#ff5e00] cursor-ew-resize"
                       />
-                      <span className="text-[11px] font-bold text-amber-500 w-12 text-right font-mono">{bpm} BPM</span>
+                      <span className="text-[11px] font-bold text-orange-400 w-12 text-right font-mono">{bpm} BPM</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">Time Signature</label>
+                    <label className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-widest">Time Signature</label>
                     <select 
                       value={timeSignature} 
                       onChange={(e) => setTimeSignature(e.target.value)}
-                      className="w-full bg-[#111218] border border-white/5 rounded-lg px-2 py-1 text-xs text-slate-300"
+                      className="w-full bg-[#1a1a1e] border border-white/5 rounded-lg px-2 py-1 text-xs text-zinc-300"
                     >
                       <option value="4/4">4/4 Common Time</option>
                       <option value="3/4">3/4 Waltz Beat</option>
@@ -746,27 +746,27 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
 
             {/* Optional Song Title custom fields */}
             <div className="space-y-1 block mt-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Song Title (Optional)</label>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Song Title (Optional)</label>
               <input
                 type="text"
                 value={songTitle}
                 onChange={(e) => setSongTitle(e.target.value)}
                 placeholder="Let You Go (Remix)"
-                className="w-full bg-[#0c0d12] border border-zinc-900 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-amber-500/40"
+                className="w-full bg-[#131316] border border-white/5 rounded-xl px-3 py-2 text-xs text-zinc-200 outline-none focus:border-orange-500/40"
               />
             </div>
 
             {/* AI Mixing Copilot strip */}
-            <div className="mt-4 bg-[#111218]/50 border border-white/5 rounded-xl p-3 space-y-2">
+            <div className="mt-4 bg-[#1a1a1e]/50 border border-white/5 rounded-xl p-3 space-y-2">
               <span className="text-[9px] font-extrabold text-[#ff711d] uppercase tracking-wider block">🎹 Copilot Signal Assist</span>
-              <p className="text-[10px] text-slate-400 font-sans leading-normal">
+              <p className="text-[10px] text-zinc-400 font-sans leading-normal">
                 Click index tracks on the grid, and scan them using live neural model advice lines.
               </p>
               
               <button 
                 onClick={triggerGetAdvice}
                 disabled={isCopilotThinking}
-                className="w-full py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-750 text-slate-100 border border-white/5 text-[9px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-1.5 rounded-lg bg-white/10 hover:bg-white/10 text-zinc-100 border border-white/5 text-[9px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
               >
                 {isCopilotThinking ? (
                   <>
@@ -775,18 +775,18 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   </>
                 ) : (
                   <>
-                    <Sparkles size={11} className="text-slate-400" />
+                    <Sparkles size={11} className="text-zinc-400" />
                     <span>Run Neural Mix Scan</span>
                   </>
                 )}
               </button>
 
               {copilotHistory.length > 0 && (
-                <div className="max-h-24 overflow-y-auto custom-scrollbar pt-1 pr-1 border-t border-zinc-900">
+                <div className="max-h-24 overflow-y-auto custom-scrollbar pt-1 pr-1 border-t border-white/5">
                   {copilotHistory.slice(-2).map((h, i) => (
-                    <div key={i} className="text-[9px] leading-relaxed mt-1.5 border-b border-zinc-900/30 pb-1">
-                      <span className="font-extrabold uppercase text-[#ff5e00] tracking-wider">{h.role === 'user' ? 'Channel Filter' : 'Advice Outcome'}:</span>{' '}
-                      <span className="text-slate-300 font-sans italic">{h.text}</span>
+                    <div key={i} className="text-[9px] leading-relaxed mt-1.5 border-b border-white/5/30 pb-1">
+                      <span className="font-extrabold uppercase text-orange-400 tracking-wider">{h.role === 'user' ? 'Channel Filter' : 'Advice Outcome'}:</span>{' '}
+                      <span className="text-zinc-300 font-sans italic">{h.text}</span>
                     </div>
                   ))}
                 </div>
@@ -796,20 +796,20 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
           </div>
 
           {/* Core Creation Trigger at bottom */}
-          <div className="p-3.5 bg-[#090a10] border-t border-zinc-900 shrink-0 space-y-2">
+          <div className="p-3.5 bg-[#131316] border-t border-white/5 shrink-0 space-y-2">
             {/* Auto-Save indicator */}
-            <div className="flex items-center justify-between text-[9px] text-emerald-400 bg-emerald-950/30 border border-emerald-500/25 px-2.5 py-1 rounded-lg">
+            <div className="flex items-center justify-between text-[9px] text-orange-400 bg-orange-950/30 border border-orange-500/25 px-2.5 py-1 rounded-lg">
               <div className="flex items-center gap-1.5 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
                 <span>Auto-Save: Active</span>
               </div>
-              <span className="text-[8px] text-emerald-400/80">Every song saved to Library</span>
+              <span className="text-[8px] text-orange-400/80">Every song saved to Library</span>
             </div>
 
             <button 
               onClick={handleCreateMagicSunoTrack}
               disabled={isGeneratingMidi}
-              className="w-full h-10 bg-gradient-to-r from-[#ff5e00] to-orange-500 hover:brightness-110 text-white font-black rounded-lg text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-orange-950/25 active:scale-[0.98] transition-all"
+              className="w-full h-10 bg-gradient-to-r from-orange-500 to-red-600 hover:brightness-110 text-white font-black rounded-lg text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-black/40 active:scale-[0.98] transition-all"
             >
               {isGeneratingMidi ? (
                 <>
@@ -828,22 +828,22 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
         </div>
 
         {/* PANEL B: MIDDLE TIMELINE PANEL (Arrangement visualizer, ruler, detailed wave view) */}
-        <div className="flex-1 bg-[#0c0d12] flex flex-col min-w-0 overflow-hidden relative">
+        <div className="flex-1 bg-[#131316] flex flex-col min-w-0 overflow-hidden relative">
           
           {/* Timeline Header Row (with song select, playhead slider triggers, Undo/Redo) */}
-          <div className="h-10 bg-[#090a10] border-b border-[#13141a] flex items-center justify-between px-3.5 shrink-0 z-20">
+          <div className="h-10 bg-[#131316] border-b border-white/5 flex items-center justify-between px-3.5 shrink-0 z-20">
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => alert('Channel selection backward matrix mapped.')}
-                className="h-6 w-6 rounded-md hover:bg-zinc-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-xs font-bold"
+                className="h-6 w-6 rounded-md hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors text-xs font-bold"
               >
                 ←
               </button>
 
               {/* Middle Title Pill matching mockup */}
-              <div className="flex items-center gap-2 bg-[#121319] hover:bg-zinc-800 border border-white/5 rounded-full py-1 px-3 cursor-pointer select-none">
-                <span className="h-4.5 w-4.5 rounded-md bg-[#ff5e00]/20 text-[#ff5e00] text-[8px] font-black flex items-center justify-center font-mono">D</span>
-                <span className="text-[10px] font-extrabold text-slate-200 uppercase tracking-tight">{songTitle || "Don't Hate"}</span>
+              <div className="flex items-center gap-2 bg-[#1a1a1e] hover:bg-white/10 border border-white/5 rounded-full py-1 px-3 cursor-pointer select-none">
+                <span className="h-4.5 w-4.5 rounded-md bg-orange-500/20 text-orange-400 text-[8px] font-black flex items-center justify-center font-mono">D</span>
+                <span className="text-[10px] font-extrabold text-zinc-200 uppercase tracking-tight">{songTitle || "Don't Hate"}</span>
               </div>
             </div>
 
@@ -852,19 +852,19 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               <button 
                 onClick={() => alert('Undo action!')}
                 title="Undo"
-                className="h-7 w-7 rounded-md hover:bg-zinc-800 text-slate-400 hover:text-white transition-colors flex items-center justify-center"
+                className="h-7 w-7 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors flex items-center justify-center"
               >
                 ↶
               </button>
               <button 
                 onClick={() => alert('Redo action!')}
                 title="Redo"
-                className="h-7 w-7 rounded-md hover:bg-[#181922] text-slate-400 hover:text-white transition-colors flex items-center justify-center"
+                className="h-7 w-7 rounded-md hover:bg-white/5 text-zinc-400 hover:text-white transition-colors flex items-center justify-center"
               >
                 ↷
               </button>
               
-              <div className="h-4 w-px bg-zinc-800/80 mx-1 self-center"></div>
+              <div className="h-4 w-px bg-white/10 mx-1 self-center"></div>
 
               {/* Version pill indicators */}
               <div className="flex items-center gap-1.5 text-[8px] font-black text-[#10b981] uppercase tracking-widest bg-[#10b981]/10 px-2.0 py-1 rounded-full border border-[#10b981]/20">
@@ -878,9 +878,9 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
           <div className="flex-1 flex flex-col min-h-0 overflow-y-auto custom-scrollbar relative">
             
             {/* Timeline Bars Grid Header (1, 9, 17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97...) */}
-            <div className="h-7 bg-[#090a10]/60 border-b border-zinc-900 flex relative shrink-0">
-              <div className="w-[180px] h-full border-r border-[#13141a] bg-[#090a10]/50 shrink-0 select-none flex items-center px-4">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest font-mono">Channel Matrix</span>
+            <div className="h-7 bg-[#131316]/60 border-b border-white/5 flex relative shrink-0">
+              <div className="w-[180px] h-full border-r border-white/5 bg-[#131316]/50 shrink-0 select-none flex items-center px-4">
+                <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest font-mono">Channel Matrix</span>
               </div>
               <div className="flex-1 h-full relative select-none">
                 {/* Visual intervals matching timeline image */}
@@ -890,7 +890,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                     className="absolute top-0 bottom-0 border-l border-white/5 flex flex-col justify-center pl-1.5" 
                     style={{ left: `${(idx / 8) * 100}%` }}
                   >
-                    <span className="text-[8px] font-mono text-slate-600 font-extrabold">{bar}</span>
+                    <span className="text-[8px] font-mono text-zinc-600 font-extrabold">{bar}</span>
                   </div>
                 ))}
               </div>
@@ -914,13 +914,13 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   <div 
                     key={track.id}
                     onClick={() => setSelectedTrackId(track.id)}
-                    className={`h-16 border-b border-[#13141a]/60 flex hover:bg-white/[0.015] transition-all cursor-pointer ${
+                    className={`h-16 border-b border-white/5 flex hover:bg-white/[0.015] transition-all cursor-pointer ${
                       isSelected ? 'bg-white/[0.035]' : ''
                     }`}
                   >
                     {/* Track properties (Left bar of row) */}
-                    <div className={`w-[180px] h-full border-r border-[#13141a]/60 flex flex-col justify-center px-3 gap-1.5 shrink-0 select-none ${
-                        isSelected ? 'bg-[#121319]' : 'bg-[#090a10]/30'
+                    <div className={`w-[180px] h-full border-r border-white/5 flex flex-col justify-center px-3 gap-1.5 shrink-0 select-none ${
+                        isSelected ? 'bg-[#1a1a1e]' : 'bg-[#131316]/30'
                     }`}>
                       <div className="flex items-center justify-between">
                         <span className={`text-[10px] font-black truncate max-w-[110px] tracking-tight uppercase ${track.textColor}`}>
@@ -928,7 +928,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         </span>
                         
                         {/* Dynamic live peak indicators to simulation volume heights */}
-                        <div className="flex items-end gap-0.5 h-3 justify-center w-8 bg-black/40 px-1 rounded-sm border border-white/5">
+                        <div className="flex items-end gap-0.5 h-3 justify-center w-8 bg-[#131316] px-1 rounded-sm border border-white/5">
                           <span className="w-1 bg-[#10b981] transition-all duration-75 rounded-t-xs" style={{ height: `${isPlaying && !track.muted ? peakLevels[track.id] * 0.7 : 2}%` }}></span>
                           <span className="w-1 bg-yellow-400 transition-all duration-75 rounded-t-xs" style={{ height: `${isPlaying && !track.muted ? peakLevels[track.id] * 0.6 : 2}%` }}></span>
                           <span className="w-1 bg-red-500 transition-all duration-75 rounded-t-xs" style={{ height: `${isPlaying && !track.muted ? peakLevels[track.id] * 0.45 : 2}%` }}></span>
@@ -945,7 +945,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                           className={`w-6 h-5 rounded text-[8px] font-black transition-colors ${
                             track.solo 
                               ? 'bg-yellow-500 text-black' 
-                              : 'bg-zinc-800 hover:bg-zinc-700 text-slate-400'
+                              : 'bg-white/10 hover:bg-zinc-700 text-zinc-400'
                           }`}
                         >
                           S
@@ -958,14 +958,14 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                           className={`w-6 h-5 rounded text-[8px] font-black transition-colors ${
                             track.muted 
                               ? 'bg-red-500 text-white' 
-                              : 'bg-zinc-800 hover:bg-zinc-700 text-slate-400'
+                              : 'bg-white/10 hover:bg-zinc-700 text-zinc-400'
                           }`}
                         >
                           M
                         </button>
 
                         {/* Slider bar for Individual Track Volume */}
-                        <div className="flex-1 flex items-center gap-1 bg-[#111] py-0.5 px-1.5 rounded border border-white/5 relative h-5 select-none shrink-0 overflow-hidden">
+                        <div className="flex-1 flex items-center gap-1 bg-[#1a1a1e] py-0.5 px-1.5 rounded border border-white/5 relative h-5 select-none shrink-0 overflow-hidden">
                           <input 
                             type="range" 
                             min="0" 
@@ -983,7 +983,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                     </div>
 
                     {/* Timeline grid clip space */}
-                    <div className="flex-1 relative bg-[#090a10]/15 select-none overflow-hidden h-full">
+                    <div className="flex-1 relative bg-[#131316]/15 select-none overflow-hidden h-full">
                       {/* Vertical Grid Gridlines to preserve visual integrity */}
                       <div className="absolute inset-0 flex justify-between pointer-events-none opacity-5">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map(g => (
@@ -1028,29 +1028,29 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               })}
 
               {/* FLOATING PILL BAR (Vocals ▾ | Styles | Lyrics | Cover) exactly like the design */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center bg-[#070709]/90 border border-zinc-800 shadow-2xl p-1 rounded-full text-slate-300 gap-1 backdrop-blur-md">
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center bg-[#0a0a0b]/90 border border-white/5 shadow-2xl p-1 rounded-full text-zinc-300 gap-1 backdrop-blur-md">
                 <button 
                   onClick={() => alert('Vocals layer drop mapped.')} 
-                  className="px-4 py-1.5 hover:bg-zinc-800 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 text-white"
+                  className="px-4 py-1.5 hover:bg-white/10 rounded-full text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5 text-white"
                 >
                   <span className="h-2 w-2 rounded-full bg-[#10b981]"></span>
                   <span>Vocals ▾</span>
                 </button>
-                <span className="h-3 w-px bg-zinc-800"></span>
+                <span className="h-3 w-px bg-white/10"></span>
                 <button 
                   onClick={() => setIsStylesOpen(true)}
-                  className="px-4 py-1.5 hover:bg-zinc-800 rounded-full text-[10px] font-bold tracking-wider uppercase"
+                  className="px-4 py-1.5 hover:bg-white/10 rounded-full text-[10px] font-bold tracking-wider uppercase"
                 >
                   Styles
                 </button>
-                <span className="h-3 w-px bg-zinc-800"></span>
+                <span className="h-3 w-px bg-white/10"></span>
                 <button 
                   onClick={() => setIsLyricsOpen(true)}
-                  className="px-4 py-1.5 hover:bg-zinc-800 rounded-full text-[10px] font-bold tracking-wider uppercase"
+                  className="px-4 py-1.5 hover:bg-white/10 rounded-full text-[10px] font-bold tracking-wider uppercase"
                 >
                   Lyrics
                 </button>
-                <span className="h-3 w-px bg-zinc-800"></span>
+                <span className="h-3 w-px bg-white/10"></span>
                 <button 
                   onClick={() => {
                     alert('Generating audio Cover layer remix stems!');
@@ -1066,22 +1066,22 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
           </div>
 
           {/* Bottom zoom details waveform canvas panel (gorgeous detailed Wave Editor) */}
-          <div className="h-[230px] border-t border-[#13141a] bg-[#090a10] flex flex-col shrink-0 select-none relative">
+          <div className="h-[230px] border-t border-white/5 bg-[#131316] flex flex-col shrink-0 select-none relative">
             
             {/* Header controls overlay */}
-            <div className="p-2 bg-black/40 border-b border-zinc-900/60 flex items-center justify-between shrink-0 px-4">
+            <div className="p-2 bg-[#131316] border-b border-white/5 flex items-center justify-between shrink-0 px-4">
               <div className="flex items-center gap-4 text-left">
-                <span className="text-[10px] font-black tracking-widest text-[#ff5e00] uppercase font-mono">
+                <span className="text-[10px] font-black tracking-widest text-orange-400 uppercase font-mono">
                   {songTitle} (Vocals Zoom-Grid)
                 </span>
-                <div className="h-3.5 w-px bg-zinc-800"></div>
+                <div className="h-3.5 w-px bg-white/10"></div>
                 <span className="text-[9px] text-[#10b981] font-bold uppercase tracking-wider">Timestretch On</span>
-                <span className="text-[9px] text-slate-500 hover:text-white cursor-pointer transition-colors uppercase font-bold" onClick={() => alert('Markers reset to zero!')}>Reset Markers</span>
-                <span className="text-[9px] text-slate-500 hover:text-white cursor-pointer transition-colors uppercase font-bold" onClick={() => alert('Grid snapped to 101 BPM!')}>Quantize</span>
+                <span className="text-[9px] text-zinc-500 hover:text-white cursor-pointer transition-colors uppercase font-bold" onClick={() => alert('Markers reset to zero!')}>Reset Markers</span>
+                <span className="text-[9px] text-zinc-500 hover:text-white cursor-pointer transition-colors uppercase font-bold" onClick={() => alert('Grid snapped to 101 BPM!')}>Quantize</span>
               </div>
               <button 
                 onClick={() => alert('Timeline cut slice initiated.')}
-                className="h-6 w-6 hover:bg-zinc-800 rounded flex items-center justify-center text-slate-500 hover:text-white transition-colors"
+                className="h-6 w-6 hover:bg-white/10 rounded flex items-center justify-center text-zinc-500 hover:text-white transition-colors"
                 title="Split Wave Clip"
               >
                 <Scissors size={12} />
@@ -1122,7 +1122,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         className={`w-full transition-all duration-150 rounded-t-full ${
                           isScrubbed 
                             ? 'bg-gradient-to-t from-violet-500 to-[#c084fc] shadow-[0_0_10px_rgba(168,85,247,0.3)]' 
-                            : 'bg-zinc-800'
+                            : 'bg-white/10'
                         }`}
                         style={{ height: `${ampVal}px` }}
                       />
@@ -1132,7 +1132,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         className={`w-full transition-all duration-150 rounded-b-full ${
                           isScrubbed 
                             ? 'bg-gradient-to-b from-blue-500 to-indigo-400 shadow-[0_0_10px_rgba(59,130,246,0.2)]' 
-                            : 'bg-zinc-800'
+                            : 'bg-white/10'
                         }`}
                         style={{ height: `${ampVal * 0.8}px` }}
                       />
@@ -1142,7 +1142,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               </div>
 
               {/* Interactive micro timing rulers under the wave */}
-              <div className="absolute bottom-2 left-6 right-6 flex justify-between text-[7px] font-mono text-slate-600">
+              <div className="absolute bottom-2 left-6 right-6 flex justify-between text-[7px] font-mono text-zinc-600">
                 <span>00:00</span>
                 <span>00:15</span>
                 <span>00:30</span>
@@ -1156,7 +1156,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
             </div>
 
             {/* DAW METRICS TRANSPORT BOTTOM BAR */}
-            <div className="h-10 bg-[#070709] border-t border-[#13141a] flex items-center justify-between px-4 shrink-0 px-3 z-30 select-none">
+            <div className="h-10 bg-[#0a0a0b] border-t border-white/5 flex items-center justify-between px-4 shrink-0 px-3 z-30 select-none">
               
               {/* Left actions */}
               <div className="flex items-center gap-2">
@@ -1169,7 +1169,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                     ]);
                     alert('Custom audio track mapped to timeline grid!');
                   }}
-                  className="h-6.5 px-2 bg-zinc-900 hover:bg-zinc-800 text-[9px] font-black uppercase tracking-wider text-slate-300 rounded border border-white/5 flex items-center gap-1 transition-colors"
+                  className="h-6.5 px-2 bg-[#1a1a1e] hover:bg-white/10 text-[9px] font-black uppercase tracking-wider text-zinc-300 rounded border border-white/5 flex items-center gap-1 transition-colors"
                 >
                   <Plus size={10} />
                   <span>Track</span>
@@ -1177,27 +1177,27 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                 
                 <button 
                   onClick={() => alert('Launch file explorer to upload WAV or MP3 stem files...')}
-                  className="h-6.5 px-2 bg-zinc-900 hover:bg-zinc-800 text-[9px] font-black uppercase tracking-wider text-slate-300 rounded border border-white/5 flex items-center gap-1 transition-colors"
+                  className="h-6.5 px-2 bg-[#1a1a1e] hover:bg-white/10 text-[9px] font-black uppercase tracking-wider text-zinc-300 rounded border border-white/5 flex items-center gap-1 transition-colors"
                 >
                   <Upload size={10} />
                   <span>Upload</span>
                 </button>
 
-                <div className="h-4 w-px bg-zinc-800 mx-1"></div>
+                <div className="h-4 w-px bg-white/10 mx-1"></div>
 
                 {/* Meter matrix metadata */}
                 <div className="flex gap-2 text-[10px] font-mono select-none">
                   <div className="flex items-center gap-1">
-                    <span className="text-slate-600 font-extrabold uppercase text-[8px] tracking-wide">Sig</span>
-                    <span className="text-slate-300 font-bold">{timeSignature}</span>
+                    <span className="text-zinc-600 font-extrabold uppercase text-[8px] tracking-wide">Sig</span>
+                    <span className="text-zinc-300 font-bold">{timeSignature}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-slate-600 font-extrabold uppercase text-[8px] tracking-wide">BPM</span>
+                    <span className="text-zinc-600 font-extrabold uppercase text-[8px] tracking-wide">BPM</span>
                     <input 
                       type="number" 
                       value={bpm}
                       onChange={(e) => setBpm(Math.max(40, Math.min(240, parseInt(e.target.value) || 120)))}
-                      className="bg-transparent border-none text-slate-300 w-8 outline-none font-bold p-0 text-center select-all focus:ring-0"
+                      className="bg-transparent border-none text-zinc-300 w-8 outline-none font-bold p-0 text-center select-all focus:ring-0"
                     />
                   </div>
                 </div>
@@ -1211,7 +1211,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                     setActiveTimeStr('00:00.000');
                     setActiveBarBeats('001.1.00');
                   }}
-                  className="w-6 h-6 rounded-md hover:bg-zinc-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                  className="w-6 h-6 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
                   title="Rewind to start"
                 >
                   <RotateCcw size={13} />
@@ -1223,7 +1223,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md ${
                     isPlaying 
                       ? 'bg-red-500 text-white shadow-red-950/20' 
-                      : 'bg-gradient-to-r from-orange-500 to-[#ff5e00] text-black shadow-orange-950/20 hover:scale-105'
+                      : 'bg-gradient-to-r from-orange-500 to-red-600 text-black shadow-black/40 hover:scale-105'
                   }`}
                   title={isPlaying ? 'Pause Synthesizer' : 'Play Synthesizer'}
                 >
@@ -1239,8 +1239,8 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   onClick={() => setIsLooping(!isLooping)}
                   className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase transition-colors border ${
                     isLooping 
-                      ? 'bg-[#ff5e00]/10 text-[#ff5e00] border-[#ff5e00]/25' 
-                      : 'bg-zinc-900 border-white/5 text-slate-500 hover:text-slate-300'
+                      ? 'bg-orange-500/10 text-orange-400 border-orange-500/25' 
+                      : 'bg-[#1a1a1e] border-white/5 text-zinc-500 hover:text-zinc-300'
                   }`}
                 >
                   Loop
@@ -1252,7 +1252,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase transition-colors border ${
                     metronomeOn 
                       ? 'bg-[#10b981]/15 text-[#10b981] border-[#10b981]/25' 
-                      : 'bg-zinc-900 border-white/5 text-slate-500 hover:text-slate-300'
+                      : 'bg-[#1a1a1e] border-white/5 text-zinc-500 hover:text-zinc-300'
                   }`}
                 >
                   Click
@@ -1262,24 +1262,24 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               {/* Right timing feedback + Master volume slider */}
               <div className="flex items-center gap-3">
                 {/* Numeric Time Counter */}
-                <div className="flex bg-[#111218] rounded border border-white/5 py-0.5 px-2.5 items-center gap-3">
+                <div className="flex bg-[#1a1a1e] rounded border border-white/5 py-0.5 px-2.5 items-center gap-3">
                   <span className="text-[10px] font-mono text-cyan-400 font-extrabold tabular-nums tracking-wide">{activeTimeStr}</span>
-                  <div className="h-3 w-px bg-zinc-800/80"></div>
-                  <span className="text-[10px] font-mono text-amber-500 font-extrabold tabular-nums tracking-wide">{activeBarBeats}</span>
+                  <div className="h-3 w-px bg-white/10"></div>
+                  <span className="text-[10px] font-mono text-orange-400 font-extrabold tabular-nums tracking-wide">{activeBarBeats}</span>
                 </div>
 
                 {/* Master volume controller */}
                 <div className="flex items-center gap-1.5">
-                  <Volume2 size={12} className="text-slate-500 shrink-0" />
+                  <Volume2 size={12} className="text-zinc-500 shrink-0" />
                   <input 
                     type="range" 
                     min="0" 
                     max="100" 
                     value={masterVolume} 
                     onChange={(e) => setMasterVolume(parseInt(e.target.value))}
-                    className="w-16 accent-[#ff5e00] h-1 bg-zinc-800 rounded-lg cursor-ew-resize opacity-80 hover:opacity-100"
+                    className="w-16 accent-[#ff5e00] h-1 bg-white/10 rounded-lg cursor-ew-resize opacity-80 hover:opacity-100"
                   />
-                  <span className="text-[9px] font-mono font-black text-slate-400 w-5 text-right">{masterVolume}%</span>
+                  <span className="text-[9px] font-mono font-black text-zinc-400 w-5 text-right">{masterVolume}%</span>
                 </div>
               </div>
 
@@ -1290,11 +1290,11 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
         </div>
 
         {/* PANEL C: RIGHT INSPECTOR PANEL (Clip Settings, Stems Extractor) */}
-        <div className="w-[280px] border-l border-[#13141a] bg-[#090a0f] flex flex-col shrink-0 min-h-0 z-30 text-left">
+        <div className="w-[280px] border-l border-white/5 bg-[#131316] flex flex-col shrink-0 min-h-0 z-30 text-left">
           
           {/* Header thumbnail and tag info block */}
-          <div className="p-4 border-b border-zinc-900/60 shrink-0 flex items-center gap-3 bg-black/15">
-            <div className="h-10 w-10 rounded-xl overflow-hidden bg-zinc-900 border border-white/10 relative">
+          <div className="p-4 border-b border-white/5 shrink-0 flex items-center gap-3 bg-black/15">
+            <div className="h-10 w-10 rounded-xl overflow-hidden bg-[#1a1a1e] border border-white/10 relative">
               <img 
                 src="https://picsum.photos/seed/sunodaw/100/100" 
                 alt="Don't Hate Album Art" 
@@ -1303,36 +1303,36 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1 text-slate-100 font-black text-[11px] uppercase tracking-tight truncate">
+              <div className="flex items-center gap-1 text-zinc-100 font-black text-[11px] uppercase tracking-tight truncate">
                 <span>{songTitle}</span>
-                <span className="text-slate-500 italic text-[9px]">✎</span>
+                <span className="text-zinc-500 italic text-[9px]">✎</span>
               </div>
-              <p className="text-[8px] text-[#ff5e00] font-black uppercase tracking-wider font-mono mt-0.5">Premier Calibrated</p>
+              <p className="text-[8px] text-orange-400 font-black uppercase tracking-wider font-mono mt-0.5">Premier Calibrated</p>
             </div>
           </div>
 
           {/* Action Row buttons (Remix, vote thumbs) */}
-          <div className="p-3 border-b border-zinc-900/60 shrink-0 flex items-center gap-1 bg-[#111218]/40">
+          <div className="p-3 border-b border-white/5 shrink-0 flex items-center gap-1 bg-[#1a1a1e]/40">
             <button 
               onClick={() => {
                 alert(`Stem mixing mapped! Styles set to atmospheric, chord settings synchronized.`);
                 setStylePrompt("slow moody organic acoustics, electronic trap snare, ambient pads");
               }}
-              className="px-4 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-750 border border-white/5 text-[9px] font-black uppercase text-slate-200 tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+              className="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/10 border border-white/5 text-[9px] font-black uppercase text-zinc-200 tracking-wider flex items-center justify-center gap-1.5 transition-colors"
             >
               <span>♻ Remix</span>
             </button>
             
             <button 
               onClick={() => alert('Voted up track remix!')}
-              className="h-7 w-7 rounded-lg hover:bg-zinc-800 text-slate-400 hover:text-white transition-colors flex items-center justify-center text-xs"
+              className="h-7 w-7 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition-colors flex items-center justify-center text-xs"
               title="Like stem"
             >
               👍
             </button>
             <button 
               onClick={() => alert('Voted down track remix!')}
-              className="h-7 w-7 rounded-lg hover:bg-zinc-800 text-slate-400 hover:text-white transition-colors flex items-center justify-center text-xs"
+              className="h-7 w-7 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition-colors flex items-center justify-center text-xs"
               title="Dislike stem"
             >
               👎
@@ -1342,7 +1342,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
             
             <button 
               onClick={() => alert('Export WAV, MIDI, or separate Multi-track audio loops.')}
-              className="h-7 w-7 rounded-lg hover:bg-zinc-800 text-slate-400 hover:text-white transition-colors flex items-center justify-center text-xs font-black"
+              className="h-7 w-7 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition-colors flex items-center justify-center text-xs font-black"
             >
               •••
             </button>
@@ -1352,18 +1352,18 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
           <div className="flex-1 overflow-y-auto p-3.5 space-y-4 custom-scrollbar text-left">
             
             {/* Clip Settings fold */}
-            <div className="space-y-3 bg-[#111218]/70 border border-white/5 rounded-2xl p-3.5 shadow-inner">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block font-mono">Clip Settings</span>
+            <div className="space-y-3 bg-[#1a1a1e]/70 border border-white/5 rounded-2xl p-3.5 shadow-inner">
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block font-mono">Clip Settings</span>
               
               <div className="space-y-1">
-                <div className="flex justify-between text-[9px] font-extrabold text-slate-500 uppercase tracking-wider">
+                <div className="flex justify-between text-[9px] font-extrabold text-zinc-500 uppercase tracking-wider">
                   <span>Sync Timing</span>
-                  <span className="text-[#ff5e00]">{tempoMatch}</span>
+                  <span className="text-orange-400">{tempoMatch}</span>
                 </div>
                 <select 
                   value={tempoMatch} 
                   onChange={(e) => setTempoMatch(e.target.value as any)}
-                  className="w-full bg-[#0c0d12] border border-zinc-900 rounded-lg px-2 py-1.5 text-xs text-slate-200"
+                  className="w-full bg-[#131316] border border-white/5 rounded-lg px-2 py-1.5 text-xs text-zinc-200"
                 >
                   <option value="On Beat">On Beat Quantized</option>
                   <option value="Free Scroll">Free Scroll</option>
@@ -1371,24 +1371,24 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-[9px] font-extrabold text-slate-500 uppercase tracking-wider items-center">
+                <div className="flex justify-between text-[9px] font-extrabold text-zinc-500 uppercase tracking-wider items-center">
                   <span>Transpose Pitch</span>
-                  <span className="text-amber-500 font-mono font-bold">{transposeSemitones > 0 ? `+${transposeSemitones}` : transposeSemitones} st</span>
+                  <span className="text-orange-400 font-mono font-bold">{transposeSemitones > 0 ? `+${transposeSemitones}` : transposeSemitones} st</span>
                 </div>
                 
                 <div className="flex gap-2 items-center">
                   <button 
                     onClick={() => setTransposeSemitones(prev => Math.max(-12, prev - 1))}
-                    className="w-8 h-7 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg border border-white/5 font-extrabold text-xs"
+                    className="w-8 h-7 bg-[#1a1a1e] hover:bg-white/10 text-white rounded-lg border border-white/5 font-extrabold text-xs"
                   >
                     -
                   </button>
-                  <div className="flex-1 bg-black/60 rounded-lg py-1 text-center font-mono text-xs text-slate-300 font-bold border border-white/5">
+                  <div className="flex-1 bg-black/60 rounded-lg py-1 text-center font-mono text-xs text-zinc-300 font-bold border border-white/5">
                     {transposeSemitones}
                   </div>
                   <button 
                     onClick={() => setTransposeSemitones(prev => Math.min(12, prev + 1))}
-                    className="w-8 h-7 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg border border-white/5 font-extrabold text-xs"
+                    className="w-8 h-7 bg-[#1a1a1e] hover:bg-white/10 text-white rounded-lg border border-white/5 font-extrabold text-xs"
                   >
                     +
                   </button>
@@ -1396,8 +1396,8 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">Playback Speed</span>
-                <div className="flex bg-[#0c0d12] p-0.5 rounded-lg border border-zinc-900">
+                <span className="text-[9px] font-extrabold text-zinc-500 uppercase tracking-wider block">Playback Speed</span>
+                <div className="flex bg-[#131316] p-0.5 rounded-lg border border-white/5">
                   {(['1/2', 'original', 'x2'] as const).map(speed => (
                     <button
                       key={speed}
@@ -1408,8 +1408,8 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                       }}
                       className={`flex-1 py-1 text-[9px] font-black uppercase rounded transition-all ${
                         speedMultiplier === speed
-                          ? 'bg-zinc-800 text-cyan-400'
-                          : 'text-slate-500 hover:text-slate-300'
+                          ? 'bg-white/10 text-cyan-400'
+                          : 'text-zinc-500 hover:text-zinc-300'
                       }`}
                     >
                       {speed === 'original' ? '1x' : speed}
@@ -1419,9 +1419,9 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-[9px] font-extrabold text-slate-500 uppercase tracking-wider">
+                <div className="flex justify-between text-[9px] font-extrabold text-zinc-500 uppercase tracking-wider">
                   <span>Clip Volume Gain</span>
-                  <span className="text-slate-400 font-mono font-bold">{clipVolume}%</span>
+                  <span className="text-zinc-400 font-mono font-bold">{clipVolume}%</span>
                 </div>
                 <input 
                   type="range" 
@@ -1429,16 +1429,16 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                   max="100" 
                   value={clipVolume} 
                   onChange={(e) => setClipVolume(parseInt(e.target.value))}
-                  className="w-full accent-cyan-400 cursor-ew-resize h-1 bg-zinc-800 rounded-lg"
+                  className="w-full accent-cyan-400 cursor-ew-resize h-1 bg-white/10 rounded-lg"
                 />
               </div>
 
             </div>
 
             {/* Stems list fold */}
-            <div className="space-y-3 bg-[#111218]/70 border border-white/5 rounded-2xl p-3.5 shadow-inner text-left">
+            <div className="space-y-3 bg-[#1a1a1e]/70 border border-white/5 rounded-2xl p-3.5 shadow-inner text-left">
               <div className="flex justify-between items-center pb-1">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-mono">Stems Extracted</span>
+                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest font-mono">Stems Extracted</span>
                 
                 <button 
                   onClick={() => {
@@ -1458,12 +1458,12 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                 {stems.map((stem) => (
                   <div 
                     key={stem.id} 
-                    className={`p-2 bg-black/40 rounded-xl border flex flex-col gap-1 transition-all hover:bg-zinc-900/60 ${
-                      stem.active ? 'border-white/5' : 'border-dashed border-zinc-800 opacity-40'
+                    className={`p-2 bg-[#131316] rounded-xl border flex flex-col gap-1 transition-all hover:bg-[#1a1a1e]/60 ${
+                      stem.active ? 'border-white/5' : 'border-dashed border-white/5 opacity-40'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black tracking-tight text-slate-300 uppercase truncate max-w-[130px]">
+                      <span className="text-[10px] font-black tracking-tight text-zinc-300 uppercase truncate max-w-[130px]">
                         {stem.name}
                       </span>
                       
@@ -1471,7 +1471,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                         <button 
                           onClick={() => setStems(stems.map(s => s.id === stem.id ? { ...s, muted: !s.muted } : s))}
                           className={`px-1.5 py-0.5 rounded text-[7.5px] font-bold ${
-                            stem.muted ? 'bg-red-950 text-red-400 border border-red-500/30' : 'bg-zinc-800 text-slate-400 hover:text-white'
+                            stem.muted ? 'bg-red-950 text-red-400 border border-red-500/30' : 'bg-white/10 text-zinc-400 hover:text-white'
                           }`}
                         >
                           Mute
@@ -1480,7 +1480,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                           onClick={() => {
                             setStems(stems.map(s => s.id === stem.id ? { ...s, active: !s.active } : s));
                           }}
-                          className="text-slate-500 hover:text-red-400 transition-colors"
+                          className="text-zinc-500 hover:text-red-400 transition-colors"
                           title="Delete stem reference"
                         >
                           <Trash2 size={10} />
@@ -1489,7 +1489,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void }> = ({ onOpenVoice }) => {
                     </div>
 
                     {/* Simulated mini detailed wave loops */}
-                    <div className="h-6 bg-black/40 rounded-md overflow-hidden flex items-center justify-between gap-[1px] px-2 select-none relative">
+                    <div className="h-6 bg-[#131316] rounded-md overflow-hidden flex items-center justify-between gap-[1px] px-2 select-none relative">
                       {Array.from({ length: 32 }).map((_, idx) => {
                         const heights = Math.abs(Math.sin((idx + stem.waveformSeed) * 0.42)) * 14 + 2;
                         return (

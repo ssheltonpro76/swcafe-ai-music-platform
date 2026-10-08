@@ -49,11 +49,11 @@ const SongListView: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 pb-32">
       <header className="flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="space-y-1">
-          <h1 className="text-4xl font-black uppercase tracking-tighter italic">Song <span className="text-blue-500">List</span></h1>
+          <h1 className="text-4xl font-semibold tracking-tight italic">Song <span className="text-orange-400">List</span></h1>
           <div className="flex items-center gap-3 flex-wrap">
-            <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em]">Integrated Recall System v4.0</p>
-            <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.4em]">Integrated Recall System v4.0</p>
+            <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/40 border border-orange-500/30 px-2.5 py-0.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
               <span>Auto-Save Active</span>
             </div>
           </div>
@@ -64,27 +64,27 @@ const SongListView: React.FC = () => {
             placeholder="Search generations..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-blue-500 transition-all"
+            className="w-full bg-[#131316] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-orange-500 transition-all"
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔍</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">🔍</span>
         </div>
       </header>
 
-      <div className="bg-[#111] rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+      <div className="bg-[#131316] rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-white/5 border-b border-white/5">
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Track Details</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Genre</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Engine</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right pr-12">Actions</th>
+              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Track Details</th>
+              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Genre</th>
+              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Engine</th>
+              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-zinc-400 text-right pr-12">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredSongs.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-8 py-20 text-center">
-                  <p className="text-slate-500 text-xs font-black uppercase tracking-widest">No songs found in the vault.</p>
+                  <p className="text-zinc-500 text-xs font-black uppercase tracking-widest">No songs found in the vault.</p>
                 </td>
               </tr>
             ) : (
@@ -97,16 +97,16 @@ const SongListView: React.FC = () => {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-black uppercase tracking-tight text-white truncate">{song.title}</p>
-                        <p className="text-[9px] text-slate-500 font-bold truncate max-w-[200px]">{song.theme || 'No theme specified'}</p>
+                        <p className="text-[9px] text-zinc-500 font-bold truncate max-w-[200px]">{song.theme || 'No theme specified'}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-white/5 px-3 py-1 rounded-md">{song.genre}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 bg-white/5 px-3 py-1 rounded-md">{song.genre}</span>
                   </td>
-                  <td className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-blue-400">
+                  <td className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-orange-400">
                     <div className="flex items-center gap-2">
-                       <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                       <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
                        {song.engine}
                     </div>
                   </td>
@@ -128,15 +128,15 @@ const SongListView: React.FC = () => {
       {/* Recall Modal */}
       {selectedSong && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-[#111] w-full max-w-2xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+          <div className="bg-[#131316] w-full max-w-2xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
             <header className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
               <div className="space-y-1">
-                <h3 className="text-xl font-black uppercase tracking-tighter text-blue-500">{selectedSong.title}</h3>
-                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic">{selectedSong.engine} • {selectedSong.genre}</p>
+                <h3 className="text-xl font-semibold tracking-tight text-orange-400">{selectedSong.title}</h3>
+                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest italic">{selectedSong.engine} • {selectedSong.genre}</p>
               </div>
               <button 
                 onClick={() => setSelectedSong(null)} 
-                className="text-slate-500 hover:text-white transition-colors"
+                className="text-zinc-500 hover:text-white transition-colors"
               >
                 ✕
               </button>
@@ -145,11 +145,11 @@ const SongListView: React.FC = () => {
               <div className="space-y-6">
                 {selectedSong.theme && (
                   <div className="bg-white/5 p-4 rounded-xl border border-white/5">
-                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Theme Intelligence</p>
-                    <p className="text-xs italic text-slate-300">"{selectedSong.theme}"</p>
+                    <p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1">Theme Intelligence</p>
+                    <p className="text-xs italic text-zinc-300">"{selectedSong.theme}"</p>
                   </div>
                 )}
-                <div className="text-base leading-relaxed text-slate-300 italic whitespace-pre-wrap font-medium">
+                <div className="text-base leading-relaxed text-zinc-300 italic whitespace-pre-wrap font-medium">
                   {selectedSong.lyrics}
                 </div>
               </div>
@@ -166,7 +166,7 @@ const SongListView: React.FC = () => {
                </button>
                <button 
                 onClick={() => setSelectedSong(null)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg"
+                className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:opacity-95 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg"
                >
                  Close Archive
                </button>

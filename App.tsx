@@ -104,25 +104,25 @@ const App: React.FC = () => {
       case 'song-list': return <SongListView />;
       case 'hooks': return <StemSplitterView />;
       case 'notifications': return (
-        <div className="max-w-2xl mx-auto space-y-6 text-left p-6 bg-[#070708] border border-white/5 rounded-3xl animate-in fade-in">
-          <div className="flex justify-between items-center pb-4 border-b border-zinc-900">
-            <h2 className="text-xl font-black uppercase tracking-tight text-white font-sans flex items-center gap-2">
+        <div className="max-w-2xl mx-auto space-y-6 text-left p-6 bg-[#131316] border border-white/5 rounded-3xl animate-in fade-in">
+          <div className="flex justify-between items-center pb-4 border-b border-white/5">
+            <h2 className="text-xl font-semibold tracking-tight text-white font-sans flex items-center gap-2">
               <span>🔔</span> Station Notifications
             </h2>
-            <span className="text-[9px] bg-[#ff5e00]/10 text-[#ff5e00] border border-[#ff5e00]/20 px-2 py-0.5 rounded font-black font-mono">3 Alerts</span>
+            <span className="text-[9px] bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full font-bold font-mono">3 Alerts</span>
           </div>
           <div className="space-y-4">
-            <div className="p-4 bg-zinc-900/40 rounded-2xl border border-white/5">
-              <p className="text-xs font-black text-white uppercase tracking-wider mb-1">🔥 Neural Core v5.5 Calibrated</p>
-              <p className="text-[11px] text-slate-400 font-sans leading-normal">SwCafe neural vocoding layers have completed fine-tuning matching stephenshelton acoustic profiles. Stems latency reduced to 12ms.</p>
+            <div className="p-4 bg-[#1a1a1e] rounded-2xl border border-white/5">
+              <p className="text-xs font-semibold text-white tracking-tight mb-1">🔥 Neural Core v5.5 Calibrated</p>
+              <p className="text-[11px] text-zinc-400 font-sans leading-normal">SwCafe neural vocoding layers have completed fine-tuning matching stephenshelton acoustic profiles. Stems latency reduced to 12ms.</p>
             </div>
-            <div className="p-4 bg-zinc-900/40 rounded-2xl border border-white/5">
-              <p className="text-xs font-black text-white uppercase tracking-wider mb-1">🎉 Custom Model Lab Activated</p>
-              <p className="text-[11px] text-slate-400 font-sans leading-normal">Your custom v5.5 engine training path is unlocked! Vault 6 or more tracks to begin training personalized parameters matching your signature sound.</p>
+            <div className="p-4 bg-[#1a1a1e] rounded-2xl border border-white/5">
+              <p className="text-xs font-semibold text-white tracking-tight mb-1">🎉 Custom Model Lab Activated</p>
+              <p className="text-[11px] text-zinc-400 font-sans leading-normal">Your custom v5.5 engine training path is unlocked! Vault 6 or more tracks to begin training personalized parameters matching your signature sound.</p>
             </div>
-            <div className="p-4 bg-zinc-900/40 rounded-2xl border border-white/5">
-              <p className="text-xs font-black text-white uppercase tracking-wider mb-1">🎙️ Vocal Persona Synced</p>
-              <p className="text-[11px] text-slate-400 font-sans leading-normal">CoPilot voice models (Duo & Solo) are calibrated natively. Launch Vocal Lab from your bottom widget tray.</p>
+            <div className="p-4 bg-[#1a1a1e] rounded-2xl border border-white/5">
+              <p className="text-xs font-semibold text-white tracking-tight mb-1">🎙️ Vocal Persona Synced</p>
+              <p className="text-[11px] text-zinc-400 font-sans leading-normal">CoPilot voice models (Duo & Solo) are calibrated natively. Launch Vocal Lab from your bottom widget tray.</p>
             </div>
           </div>
         </div>
@@ -155,21 +155,21 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden font-['Inter']">
+    <div className="flex h-screen bg-[#0a0a0b] text-white overflow-hidden font-['Inter']">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onOpenVoice={() => setIsVoiceModalOpen(true)} />
       
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-16 flex items-center justify-between px-8 bg-black/40 backdrop-blur-md border-b border-white/5 z-10">
+        <header className="h-16 flex items-center justify-between px-8 bg-[#0a0a0b]/80 backdrop-blur-md border-b border-white/5 z-10">
           <div className="flex items-center gap-4">
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">
+            <h2 className="text-sm font-semibold tracking-wide text-zinc-500">
               {activeTab === 'home' ? 'Discover' : activeTab.replace('-', ' ').toUpperCase()}
             </h2>
           </div>
           <div className="flex items-center gap-4">
-            <button className="bg-white/5 hover:bg-white/10 px-4 py-1.5 rounded-full text-xs font-bold transition-all">
+            <button className="bg-white/5 hover:bg-white/10 border border-white/5 px-4 py-1.5 rounded-full text-xs font-semibold text-zinc-300 transition-all">
               Enterprise v4
             </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]"></div>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 shadow-[0_0_15px_rgba(249,115,22,0.3)]"></div>
           </div>
         </header>
 

@@ -165,7 +165,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
   return (
     <div className="max-w-[1400px] mx-auto space-y-12 animate-in fade-in duration-500 pb-32">
       {/* Banner and Avatar section with glass styling */}
-      <section className="relative rounded-[3rem] overflow-hidden bg-zinc-900 border border-white/5 shadow-2xl">
+      <section className="relative rounded-[3rem] overflow-hidden bg-[#131316] border border-white/5 shadow-2xl">
         <div className="h-64 md:h-80 w-full overflow-hidden relative">
           <img src={profile.banner} alt="Banner" className="w-full h-full object-cover opacity-60" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
@@ -182,13 +182,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
         </div>
 
         <div className="p-8 md:p-12 relative flex flex-col md:flex-row items-start md:items-end md:gap-10 -mt-24 md:-mt-32 z-10 w-full">
-          <img src={profile.avatar} alt="Avatar" className="w-40 h-40 rounded-[2.5rem] border-[6px] border-zinc-950 object-cover shadow-2xl" />
+          <img src={profile.avatar} alt="Avatar" className="w-40 h-40 rounded-[2.5rem] border-[6px] border-[#0a0a0b] object-cover shadow-2xl" />
           
           <div className="flex-1 space-y-4 pt-6 md:pt-0 text-left">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
               <div className="space-y-1">
-                <h2 className="text-4xl font-black tracking-tighter uppercase italic">{profile.username}</h2>
-                <div className="flex flex-wrap gap-4 text-xs font-bold text-slate-400">
+                <h2 className="text-4xl font-semibold tracking-tight uppercase italic">{profile.username}</h2>
+                <div className="flex flex-wrap gap-4 text-xs font-bold text-zinc-400">
                   {profile.socials.twitter && <a href={profile.socials.twitter} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">🕊️ Twitter</a>}
                   {profile.socials.spotify && <a href={profile.socials.spotify} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">🎵 Spotify</a>}
                   {profile.socials.soundcloud && <a href={profile.socials.soundcloud} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">🔥 SoundCloud</a>}
@@ -202,7 +202,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
               </button>
             </div>
             
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed font-medium max-w-3xl">
+            <p className="text-zinc-300 text-sm md:text-base leading-relaxed font-medium max-w-3xl">
               {profile.bio}
             </p>
           </div>
@@ -218,14 +218,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
             <div className="flex items-center gap-3">
               <span className="text-2xl">📌</span>
               <div className="space-y-0.5">
-                <h3 className="text-xl font-black uppercase tracking-tight">Pinned Favorites</h3>
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Showcase & Remix Catalog (Max 5)</p>
+                <h3 className="text-xl font-semibold tracking-tight uppercase">Pinned Favorites</h3>
+                <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Showcase & Remix Catalog (Max 5)</p>
               </div>
             </div>
             {pinned.length < 5 && (
               <button 
                 onClick={() => setIsPinSelectorOpen(true)}
-                className="bg-[#FF6B6B] hover:bg-[#ff5555] text-black px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all"
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:opacity-90 text-black px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all"
               >
                 Pin Track
               </button>
@@ -234,7 +234,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {pinned.length === 0 ? (
-              <div className="col-span-full h-44 flex flex-col items-center justify-center bg-white/[0.01] border-2 border-dashed border-white/5 rounded-[2rem] text-slate-500 text-sm font-semibold uppercase tracking-widest p-6">
+              <div className="col-span-full h-44 flex flex-col items-center justify-center bg-white/[0.01] border-2 border-dashed border-white/5 rounded-[2rem] text-zinc-500 text-sm font-semibold uppercase tracking-widest p-6">
                 No pinned favorites yet. Pin up to 5 tracks!
               </div>
             ) : (
@@ -242,7 +242,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                 const song = getSongById(pin.songId);
                 if (!song) return null;
                 return (
-                  <div key={pin.songId} className="group bg-[#111] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-[#FF6B6B]/40 transition-all shadow-xl flex flex-col relative h-[380px]">
+                  <div key={pin.songId} className="group bg-[#131316] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-orange-500/40 transition-all shadow-xl flex flex-col relative h-[380px]">
                     <div className="flex-1 relative overflow-hidden group">
                       <img src={`https://picsum.photos/seed/${song.coverId}/400/400`} alt={song.title} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
@@ -264,17 +264,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                       </button>
 
                       <div className="absolute bottom-4 left-4 right-4">
-                        <span className="bg-white/10 backdrop-blur-md px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest text-[#FF6B6B] border border-white/10 mb-2 inline-block">
+                        <span className="bg-white/10 backdrop-blur-md px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest text-orange-400 border border-white/10 mb-2 inline-block">
                           {song.engine}
                         </span>
                         <h4 className="text-sm font-black uppercase truncate text-white">{song.title}</h4>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">{song.genre}</p>
+                        <p className="text-[10px] text-zinc-400 font-bold uppercase mt-0.5">{song.genre}</p>
                       </div>
                     </div>
 
                     {/* Shared Caption / Remix Zone */}
                     <div className="p-5 bg-black/40 border-t border-white/5 h-24 flex flex-col justify-between">
-                      <p className="text-xs italic text-slate-300 font-bold leading-normal line-clamp-2">
+                      <p className="text-xs italic text-zinc-300 font-bold leading-normal line-clamp-2">
                         "{pin.caption}"
                       </p>
                       <button 
@@ -282,7 +282,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                           alert(`Remix engine initiated for track "${song.title}"`);
                           onNavigate('song-creator');
                         }}
-                        className="w-full bg-white/5 hover:bg-[#FF6B6B]/20 text-[#FF6B6B] hover:text-white border border-[#FF6B6B]/20 rounded-xl py-1 px-3 text-[8px] font-black uppercase tracking-widest transition-all"
+                        className="w-full bg-white/5 hover:bg-white/10 text-orange-400 hover:text-white border border-orange-500/20 rounded-xl py-1 px-3 text-[8px] font-black uppercase tracking-widest transition-all"
                       >
                         ⚡ Remix Track
                       </button>
@@ -299,23 +299,23 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
           <div className="flex items-center gap-3 px-2">
             <span className="text-2xl">💿</span>
             <div className="space-y-0.5">
-              <h3 className="text-xl font-black uppercase tracking-tight">Profile Playlists</h3>
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Next Drive Series & Curated Playlists</p>
+              <h3 className="text-xl font-semibold tracking-tight uppercase">Profile Playlists</h3>
+              <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Next Drive Series & Curated Playlists</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {playlists.map((pl) => (
-              <div key={pl.id} className="relative rounded-[2.5rem] bg-[#111] overflow-hidden border border-white/5 p-8 flex flex-col justify-between min-h-[220px]">
+              <div key={pl.id} className="relative rounded-[2.5rem] bg-[#131316] overflow-hidden border border-white/5 p-8 flex flex-col justify-between min-h-[220px]">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="bg-[#4facfe]/10 border border-[#4facfe]/20 text-[#4facfe] px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
+                    <span className="bg-orange-500/10 border border-orange-500/20 text-orange-400 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
                       {pl.songIds.length} Tracks
                     </span>
                     <span className="text-xs opacity-40">🎵 Playlist</span>
                   </div>
                   <h4 className="text-3xl font-black tracking-tighter uppercase italic text-white">{pl.name}</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed font-medium">{pl.description}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed font-medium">{pl.description}</p>
                 </div>
 
                 <div className="pt-6 border-t border-white/5 flex flex-wrap gap-4 items-center justify-between">
@@ -324,7 +324,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                       const songObj = getSongById(sId);
                       const coverSeed = songObj ? songObj.coverId : Math.floor(Math.random() * 50);
                       return (
-                        <div key={sId} className="w-8 h-8 rounded-full border-2 border-zinc-950 overflow-hidden shadow-lg bg-zinc-800">
+                        <div key={sId} className="w-8 h-8 rounded-full border-2 border-[#0a0a0b] overflow-hidden shadow-lg bg-white/10">
                           <img src={`https://picsum.photos/seed/${coverSeed}/64/64`} alt="C" className="w-full h-full object-cover" />
                         </div>
                       );
@@ -335,7 +335,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                     {pl.id === 'playlist-drive' && (
                       <button 
                         onClick={() => onNavigate('carplay')} 
-                        className="bg-zinc-800 hover:bg-zinc-700 text-white border border-white/10 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/10 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
                       >
                         🚗 CarPlay Test
                       </button>
@@ -366,15 +366,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
       {/* Edit Profile Modal */}
       {isEditProfileOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="bg-[#0f0f0f] w-full max-w-2xl rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-[#131316] w-full max-w-2xl rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <header className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
               <div className="space-y-1">
-                 <h3 className="text-2xl font-black uppercase tracking-tighter text-[#4facfe]">Manage Profile</h3>
-                 <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Customize your SwCafe Presence</p>
+                 <h3 className="text-2xl font-semibold uppercase tracking-tight text-orange-400">Manage Profile</h3>
+                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Customize your SwCafe Presence</p>
               </div>
               <button 
                 onClick={() => setIsEditProfileOpen(false)} 
-                className="text-slate-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
+                className="text-zinc-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
               >
                 ✕
               </button>
@@ -386,7 +386,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                   type="text" 
                   value={editUsername}
                   onChange={(e) => setEditUsername(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#4facfe] outline-none"
+                  className="w-full bg-[#131316] border border-white/10 rounded-2xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
                 />
               </div>
 
@@ -395,7 +395,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                 <textarea 
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
-                  className="w-full h-24 bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#4facfe] outline-none resize-none"
+                  className="w-full h-24 bg-[#131316] border border-white/10 rounded-2xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none resize-none"
                 />
               </div>
 
@@ -405,7 +405,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                   type="text" 
                   value={editAvatar}
                   onChange={(e) => setEditAvatar(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#4facfe] outline-none"
+                  className="w-full bg-[#131316] border border-white/10 rounded-2xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
                 />
               </div>
 
@@ -415,7 +415,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                   type="text" 
                   value={editBanner}
                   onChange={(e) => setEditBanner(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#4facfe] outline-none"
+                  className="w-full bg-[#131316] border border-white/10 rounded-2xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
                 />
               </div>
 
@@ -428,7 +428,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                     value={editTwitter}
                     placeholder="https://twitter.com/..."
                     onChange={(e) => setEditTwitter(e.target.value)}
-                    className="w-full bg-black border border-white/10 rounded-xl p-3 text-[10px] font-bold outline-none"
+                    className="w-full bg-[#131316] border border-white/10 rounded-2xl p-3 text-[10px] font-bold outline-none"
                   />
                 </div>
                 <div className="space-y-2">
@@ -438,7 +438,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                     value={editSpotify}
                     placeholder="https://spotify.com/artist/..."
                     onChange={(e) => setEditSpotify(e.target.value)}
-                    className="w-full bg-black border border-white/10 rounded-xl p-3 text-[10px] font-bold outline-none"
+                    className="w-full bg-[#131316] border border-white/10 rounded-2xl p-3 text-[10px] font-bold outline-none"
                   />
                 </div>
                 <div className="space-y-2">
@@ -448,7 +448,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                     value={editSoundcloud}
                     placeholder="https://soundcloud.com/..."
                     onChange={(e) => setEditSoundcloud(e.target.value)}
-                    className="w-full bg-black border border-white/10 rounded-xl p-3 text-[10px] font-bold outline-none"
+                    className="w-full bg-[#131316] border border-white/10 rounded-2xl p-3 text-[10px] font-bold outline-none"
                   />
                 </div>
               </div>
@@ -474,15 +474,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
       {/* Pin Selector Modal */}
       {isPinSelectorOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="bg-[#0f0f0f] w-full max-w-lg rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-[#131316] w-full max-w-lg rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <header className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
               <div className="space-y-1">
-                 <h3 className="text-2xl font-black uppercase tracking-tighter text-[#FF6B6B]">Pin Favorite Song</h3>
-                 <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Pin with static or custom caption</p>
+                 <h3 className="text-2xl font-semibold uppercase tracking-tight text-orange-400">Pin Favorite Song</h3>
+                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Pin with static or custom caption</p>
               </div>
               <button 
                 onClick={() => setIsPinSelectorOpen(false)} 
-                className="text-slate-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
+                className="text-zinc-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
               >
                 ✕
               </button>
@@ -493,7 +493,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                 <select 
                   value={selectedSongToPin}
                   onChange={(e) => setSelectedSongToPin(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#FF6B6B] outline-none"
+                  className="w-full bg-[#131316] border border-white/10 rounded-2xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
                 >
                   <option value="">-- Choose a Track --</option>
                   {songs.filter(s => !pinned.some(pin => pin.songId === s.id)).map(s => (
@@ -509,7 +509,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onPlay, onNavigate }) 
                   placeholder="e.g. 🔥 My favorite generation yet. Incredible vocal delivery!"
                   value={pinCaption}
                   onChange={(e) => setPinCaption(e.target.value)}
-                  className="w-full bg-black border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#FF6B6B] outline-none"
+                  className="w-full bg-[#131316] border border-white/10 rounded-2xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
                 />
               </div>
             </div>

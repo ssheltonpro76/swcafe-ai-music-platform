@@ -98,20 +98,20 @@ const VisionCafeView: React.FC = () => {
         <div className="flex items-center gap-4">
           <span className="text-2xl">🎬</span>
           <div className="space-y-0.5">
-            <h2 className="text-xl font-black uppercase tracking-tighter italic">Vision <span className="text-[#FF6B6B]">Cafe</span></h2>
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em]">Neural Creative Suite</p>
+            <h2 className="text-xl font-semibold uppercase tracking-tight italic">Vision <span className="text-orange-400">Cafe</span></h2>
+            <p className="text-[9px] font-semibold text-zinc-500 uppercase tracking-tight">Neural Creative Suite</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setIsLibraryOpen(!isLibraryOpen)} 
-            className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${isLibraryOpen ? 'bg-white/10 text-white' : 'bg-blue-600/10 text-blue-400'}`}
+            className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${isLibraryOpen ? 'bg-white/10 text-white' : 'bg-orange-500/10 text-orange-400'}`}
           >
             {isLibraryOpen ? '◀ Library' : '▶ Library'}
           </button>
           <button 
             onClick={() => setIsPropertiesOpen(!isPropertiesOpen)} 
-            className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${isPropertiesOpen ? 'bg-white/10 text-white' : 'bg-red-600/10 text-[#FF6B6B]'}`}
+            className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${isPropertiesOpen ? 'bg-white/10 text-white' : 'bg-orange-500/10 text-orange-400'}`}
           >
             {isPropertiesOpen ? 'Properties ▶' : 'Properties ◀'}
           </button>
@@ -122,19 +122,19 @@ const VisionCafeView: React.FC = () => {
       <div className="flex-1 flex gap-6 min-h-0 relative">
         
         {/* Left: ASSET LIBRARY */}
-        <div className={`transition-all duration-300 ease-in-out bg-[#111] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl ${isLibraryOpen ? 'w-[320px]' : 'w-0 border-none'}`}>
+        <div className={`transition-all duration-300 ease-in-out bg-[#131316] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl ${isLibraryOpen ? 'w-[320px]' : 'w-0 border-none'}`}>
           <div className="min-w-[320px] flex flex-col h-full">
-            <header className="p-8 border-b border-white/5 space-y-6 bg-black/20">
-              <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Asset Library</h3>
+            <header className="p-8 border-b border-white/5 space-y-6 bg-[#131316]/20">
+              <h3 className="text-sm font-semibold tracking-tight uppercase text-zinc-500">Asset Library</h3>
               <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
                 {(['media', 'effects', 'audio'] as const).map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${activeTab === tab ? 'bg-[#FF6B6B] text-black shadow-2xl' : 'text-slate-500 hover:text-white'}`}>{tab}</button>
+                  <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${activeTab === tab ? 'bg-gradient-to-r from-orange-500 to-red-600 text-black shadow-black/40' : 'text-zinc-500 hover:text-white'}`}>{tab}</button>
                 ))}
               </div>
             </header>
             <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-6">
               <div className="space-y-3">
-                <label className="text-[9px] font-black uppercase tracking-widest text-slate-500">Starting Image</label>
+                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Starting Image</label>
                 {selectedImage ? (
                   <div className="relative group rounded-2xl overflow-hidden border border-white/10 aspect-video">
                     <img src={selectedImage.data} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -155,17 +155,17 @@ const VisionCafeView: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[9px] font-black uppercase tracking-widest text-slate-500">Aspect Ratio</label>
+                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Aspect Ratio</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button 
                     onClick={() => setAspectRatio('16:9')}
-                    className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === '16:9' ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-black/40 border-white/5 text-slate-500 hover:text-white'}`}
+                    className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === '16:9' ? 'bg-gradient-to-r from-orange-500 to-red-600 border-transparent text-white shadow-lg' : 'bg-[#131316]/40 border-white/5 text-zinc-500 hover:text-white'}`}
                   >
                     16:9
                   </button>
                   <button 
                     onClick={() => setAspectRatio('9:16')}
-                    className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === '9:16' ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-black/40 border-white/5 text-slate-500 hover:text-white'}`}
+                    className={`py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${aspectRatio === '9:16' ? 'bg-gradient-to-r from-orange-500 to-red-600 border-transparent text-white shadow-lg' : 'bg-[#131316]/40 border-white/5 text-zinc-500 hover:text-white'}`}
                   >
                     9:16
                   </button>
@@ -180,7 +180,7 @@ const VisionCafeView: React.FC = () => {
           <div className="flex-1 bg-black rounded-[2.5rem] border border-white/10 overflow-hidden shadow-2xl relative group min-h-0">
             {isGenerating ? (
               <div className="absolute inset-0 z-20 bg-[#0a0a0a]/95 flex flex-col items-center justify-center p-12 text-center space-y-10">
-                <div className="w-24 h-24 border-4 border-[#FF6B6B]/10 border-t-[#FF6B6B] rounded-full animate-spin"></div>
+                <div className="w-24 h-24 border-4 border-orange-500/10 border-t-orange-500 rounded-full animate-spin"></div>
                 <p className="text-xl font-black uppercase tracking-widest text-white italic">{genStep}</p>
               </div>
             ) : videoUrl ? (
@@ -194,13 +194,13 @@ const VisionCafeView: React.FC = () => {
           </div>
 
           {/* Prompt Hub */}
-          <div className="bg-[#111] p-10 rounded-[3rem] border border-white/5 flex flex-col gap-6 shadow-2xl">
+          <div className="bg-[#131316] p-10 rounded-[3rem] border border-white/5 flex flex-col gap-6 shadow-2xl">
              <div className="flex gap-4">
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Cinematic drone shot of a neon cyberpunk sprawl at midnight..."
-                  className="flex-1 h-28 bg-black/40 border border-white/10 rounded-3xl p-6 text-sm font-bold outline-none placeholder:text-slate-800 resize-none transition-all shadow-inner"
+                  className="flex-1 h-28 bg-[#131316]/40 border border-white/10 rounded-3xl p-6 text-sm font-bold outline-none placeholder:text-zinc-800 resize-none transition-all shadow-inner"
                 />
                 <button onClick={handleGenerate} disabled={isGenerating} className="w-48 bg-white text-black font-black rounded-3xl text-[11px] uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-2xl disabled:opacity-50">Generate AI Scene</button>
              </div>
@@ -208,10 +208,10 @@ const VisionCafeView: React.FC = () => {
         </div>
 
         {/* Right: PROPERTIES & NEURAL PARAMETERS */}
-        <div className={`transition-all duration-300 ease-in-out bg-[#111] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl ${isPropertiesOpen ? 'w-[320px]' : 'w-0 border-none'}`}>
+        <div className={`transition-all duration-300 ease-in-out bg-[#131316] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl ${isPropertiesOpen ? 'w-[320px]' : 'w-0 border-none'}`}>
           <div className="min-w-[320px] flex flex-col h-full">
-            <header className="p-8 border-b border-white/5 bg-black/20">
-              <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Properties</h3>
+            <header className="p-8 border-b border-white/5 bg-[#131316]/20">
+              <h3 className="text-sm font-semibold tracking-tight uppercase text-zinc-500">Properties</h3>
             </header>
             <div className="flex-1 overflow-y-auto custom-scrollbar p-10 space-y-12">
               <section className="space-y-8">
@@ -220,8 +220,8 @@ const VisionCafeView: React.FC = () => {
                   { label: 'Scale', key: 'scale', min: 10, max: 200, unit: '%' }
                 ].map(item => (
                   <div key={item.key} className="space-y-3">
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500"><span>{item.label}</span><span className="text-white">{(properties as any)[item.key]}{item.unit}</span></div>
-                    <input type="range" min={item.min} max={item.max} value={(properties as any)[item.key]} onChange={(e) => updateProp(item.key as any, parseInt(e.target.value))} className="w-full h-1.5 bg-black rounded-full appearance-none accent-blue-600" />
+                    <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500"><span>{item.label}</span><span className="text-white">{(properties as any)[item.key]}{item.unit}</span></div>
+                    <input type="range" min={item.min} max={item.max} value={(properties as any)[item.key]} onChange={(e) => updateProp(item.key as any, parseInt(e.target.value))} className="w-full h-1.5 bg-white/10 rounded-full appearance-none accent-orange-500" />
                   </div>
                 ))}
               </section>

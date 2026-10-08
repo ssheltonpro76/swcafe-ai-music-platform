@@ -292,16 +292,16 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
   const activeSelectedTrack = filteredTracks.find(t => t.id === selectedTrackId) || filteredTracks[0] || defaultTracks[0];
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#050506] text-white relative">
+    <div className="w-full h-full flex flex-col bg-[#0a0a0b] text-white relative">
       
       {/* Real-time Auto-Save Toast Alert */}
       {autoSaveToast && (
-        <div className="fixed top-5 right-6 z-50 bg-[#121217] border border-emerald-500/50 text-emerald-300 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold animate-in slide-in-from-top-3 backdrop-blur-md">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div className="fixed top-5 right-6 z-50 bg-[#131316] border border-orange-500/50 text-orange-300 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs font-bold animate-in slide-in-from-top-3 backdrop-blur-md">
+          <span className="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
           <span>{autoSaveToast}</span>
           <button 
             onClick={() => setAutoSaveToast(null)} 
-            className="ml-2 text-slate-400 hover:text-white text-sm"
+            className="ml-2 text-zinc-400 hover:text-white text-sm"
           >
             ✕
           </button>
@@ -314,7 +314,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
         {/* ========================================================= */}
         {/* COLUMN 1: LEFT WORKBENCH PANEL                            */}
         {/* ========================================================= */}
-        <div className="lg:col-span-3 border-r border-[#161619] bg-[#070708] flex flex-col min-h-0">
+        <div className="lg:col-span-3 border-r border-white/5 bg-[#131316] flex flex-col min-h-0">
           
           {/* Subtab selection headers (Simple vs Custom toggle) */}
           <div className="p-4 border-b border-zinc-950 flex gap-2">
@@ -322,8 +322,8 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
               onClick={() => setIsCustom(false)} 
               className={`flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
                 !isCustom 
-                  ? 'bg-zinc-800 text-[#ff5e00] border border-[#ff5e00]/25' 
-                  : 'bg-zinc-900/50 text-slate-400 hover:text-white'
+                  ? 'bg-white/10 text-orange-400 border border-orange-500/25' 
+                  : 'bg-[#1a1a1e]/50 text-zinc-400 hover:text-white'
               }`}
             >
               Simple
@@ -332,8 +332,8 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
               onClick={() => setIsCustom(true)} 
               className={`flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
                 isCustom 
-                  ? 'bg-zinc-800 text-[#ff5e00] border border-[#ff5e00]/25' 
-                  : 'bg-zinc-900/50 text-slate-400 hover:text-white'
+                  ? 'bg-white/10 text-orange-400 border border-orange-500/25' 
+                  : 'bg-[#1a1a1e]/50 text-zinc-400 hover:text-white'
               }`}
             >
               Custom
@@ -344,34 +344,34 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
           <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 text-left">
             
             {/* Auto-Save Persistence Status Indicator */}
-            <div className="px-3 py-2 bg-emerald-950/25 border border-emerald-500/20 rounded-xl flex items-center justify-between text-left">
+            <div className="px-3 py-2 bg-orange-950/25 border border-orange-500/20 rounded-xl flex items-center justify-between text-left">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300">Auto-Save: Active</span>
+                <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-orange-300">Auto-Save: Active</span>
               </div>
-              <span className="text-[9px] font-semibold text-emerald-400/80">Every generation vaulted</span>
+              <span className="text-[9px] font-semibold text-orange-400/80">Every generation vaulted</span>
             </div>
             
             {/* Simple Prompt Input Or Custom Prompt theme */}
             <div className="space-y-2.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Song Description</label>
+              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">Song Description</label>
               <textarea 
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
                 placeholder="e.g. atmospheric alternative metalcore song backings with deep drums..."
-                className="w-full h-28 bg-zinc-900/50 border border-white/5 hover:border-zinc-800 rounded-xl p-3 font-sans text-xs text-white placeholder-slate-600 focus:outline-none focus:border-[#ff5e00]/40 transition-all custom-scrollbar resize-none font-bold"
+                className="w-full h-28 bg-[#1a1a1e]/50 border border-white/5 hover:border-white/10 rounded-xl p-3 font-sans text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/40 transition-all custom-scrollbar resize-none font-bold"
               />
             </div>
 
             {/* Style input & Quick Badges */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Styles of Music</label>
+              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">Styles of Music</label>
               <input 
                 type="text" 
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
                 placeholder="alternativ, metalcore, atmospheric"
-                className="w-full bg-zinc-900/50 border border-white/5 hover:border-zinc-800 rounded-xl p-3 font-sans text-xs text-white focus:outline-none focus:border-[#ff5e00]/40 transition-all font-bold"
+                className="w-full bg-[#1a1a1e]/50 border border-white/5 hover:border-white/10 rounded-xl p-3 font-sans text-xs text-white focus:outline-none focus:border-orange-500/40 transition-all font-bold"
               />
               <div className="flex flex-wrap gap-1.5 pt-1.5">
                 {['alternativ', 'metalcore', 'lofi beats', 'synthwave', 'rock', 'atmospheric'].map(pill => (
@@ -381,7 +381,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                       if (genre.includes(pill)) return;
                       setGenre(genre ? `${genre}, ${pill}` : pill);
                     }}
-                    className="bg-zinc-900 text-slate-400 hover:bg-zinc-800 hover:text-white px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-white/5 transition-all"
+                    className="bg-[#1a1a1e] text-zinc-400 hover:bg-white/10 hover:text-white px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-white/5 transition-all"
                   >
                     {pill}
                   </button>
@@ -391,9 +391,9 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
 
             {/* Lyrics Editor Box (Only shown if Custom Mode is Active) */}
             {isCustom && (
-              <div className="space-y-2.5 animate-in slide-in-from-bottom-2 bg-zinc-950/70 p-3 rounded-2xl border border-white/5">
+              <div className="space-y-2.5 animate-in slide-in-from-bottom-2 bg-[#131316]/70 p-3 rounded-2xl border border-white/5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="text-[10px] font-black text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                     <span>✍️</span> Custom Lyrics
                   </label>
                   
@@ -401,7 +401,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     <button 
                       onClick={handleAILyricsGen}
                       disabled={isGeneratingLyrics}
-                      className="text-[9px] text-[#ff5e00] hover:text-[#ff7e3c] font-black uppercase flex items-center gap-1 transition-all disabled:opacity-50"
+                      className="text-[9px] text-orange-400 hover:text-orange-300 font-black uppercase flex items-center gap-1 transition-all disabled:opacity-50"
                       title="Generate full lyrics using AI based on description and genre"
                     >
                       {isGeneratingLyrics ? '✨ Drafting...' : '✨ AI Generate'}
@@ -409,7 +409,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     {onOpenLyricStudio && (
                       <button
                         onClick={onOpenLyricStudio}
-                        className="text-[9px] text-slate-400 hover:text-white font-bold uppercase transition-colors"
+                        className="text-[9px] text-zinc-400 hover:text-white font-bold uppercase transition-colors"
                         title="Open in full-screen Lyrics Studio"
                       >
                         Studio ↗
@@ -424,7 +424,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     <button
                       key={tag}
                       onClick={() => handleInsertTag(tag)}
-                      className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-[#ff5e00] text-slate-400 hover:text-white text-[8px] font-black uppercase transition-all"
+                      className="px-1.5 py-0.5 rounded bg-[#1a1a1e] hover:bg-gradient-to-r from-orange-500 to-red-600 text-zinc-400 hover:text-white text-[8px] font-black uppercase transition-all"
                     >
                       {tag}
                     </button>
@@ -435,7 +435,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                   value={lyrics}
                   onChange={(e) => setLyrics(e.target.value)}
                   placeholder="[Intro]\n(Pads building slowly...)\n\n[Verse 1]\nOur broken shadows meet again...\n\n[Chorus]\nIt hurts like hell to let you go..."
-                  className="w-full h-44 bg-zinc-900/80 border border-white/10 hover:border-white/20 rounded-xl p-3 font-mono text-[10px] leading-relaxed text-slate-200 focus:outline-none focus:border-[#ff5e00]/50 resize-none custom-scrollbar"
+                  className="w-full h-44 bg-[#1a1a1e]/80 border border-white/10 hover:border-white/20 rounded-xl p-3 font-mono text-[10px] leading-relaxed text-zinc-200 focus:outline-none focus:border-orange-500/50 resize-none custom-scrollbar"
                 />
 
                 {/* Co-Writing & Extension Tools */}
@@ -443,21 +443,21 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                   <button
                     onClick={() => handleAIContinue('Chorus')}
                     disabled={isContinuingLyrics}
-                    className="flex-1 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-slate-300 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider border border-white/5 transition-all disabled:opacity-50"
+                    className="flex-1 py-1.5 bg-[#1a1a1e] hover:bg-white/10 text-zinc-300 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider border border-white/5 transition-all disabled:opacity-50"
                   >
                     + AI Chorus
                   </button>
                   <button
                     onClick={() => handleAIContinue('Verse 2')}
                     disabled={isContinuingLyrics}
-                    className="flex-1 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-slate-300 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider border border-white/5 transition-all disabled:opacity-50"
+                    className="flex-1 py-1.5 bg-[#1a1a1e] hover:bg-white/10 text-zinc-300 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider border border-white/5 transition-all disabled:opacity-50"
                   >
                     + AI Verse 2
                   </button>
                   <button
                     onClick={() => handleAIContinue('Bridge')}
                     disabled={isContinuingLyrics}
-                    className="flex-1 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-slate-300 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider border border-white/5 transition-all disabled:opacity-50"
+                    className="flex-1 py-1.5 bg-[#1a1a1e] hover:bg-white/10 text-zinc-300 hover:text-white rounded-lg text-[8px] font-black uppercase tracking-wider border border-white/5 transition-all disabled:opacity-50"
                   >
                     + AI Bridge
                   </button>
@@ -468,15 +468,15 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
           </div>
 
           {/* Workbench Title input & Create trigger footer */}
-          <div className="p-4 bg-zinc-950/50 border-t border-zinc-900 space-y-3">
+          <div className="p-4 bg-[#131316]/50 border-t border-white/5 space-y-3">
             <div className="space-y-1">
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-left block">Title</label>
+              <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest text-left block">Title</label>
               <input 
                 type="text" 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Hurts Like Hell"
-                className="w-full bg-zinc-900 border border-white/5 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-[#1a1a1e] border border-white/5 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
               />
             </div>
 
@@ -487,7 +487,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                   setLyrics('');
                   setTheme('');
                 }}
-                className="p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-slate-400 hover:text-white transition-colors border border-white/5"
+                className="p-3 rounded-xl bg-[#1a1a1e] hover:bg-white/10 text-zinc-400 hover:text-white transition-colors border border-white/5"
                 title="Reset active form"
               >
                 🗑️
@@ -496,7 +496,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
               <button 
                 onClick={handleGenerate}
                 disabled={isProcessing}
-                className="flex-1 bg-gradient-to-r from-[#ff5e00] to-orange-500 hover:from-[#ff731d] hover:to-orange-400 text-white font-black py-3 rounded-xl shadow-lg shadow-orange-600/10 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-500 text-white font-black py-3 rounded-xl shadow-lg shadow-black/40 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
                   <span className="flex items-center gap-1.5">
@@ -518,37 +518,37 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
         {/* ========================================================= */}
         {/* COLUMN 2: CENTER BOARD (WORKSPACES LIST)                 */}
         {/* ========================================================= */}
-        <div className="lg:col-span-6 bg-[#0c0c0e] flex flex-col min-h-0">
+        <div className="lg:col-span-6 bg-[#1a1a1e] flex flex-col min-h-0">
           
           {/* Header Workspace Navigator */}
-          <div className="p-4 border-b border-[#161619] flex justify-between items-center bg-[#070708]/60">
+          <div className="p-4 border-b border-white/5 flex justify-between items-center bg-[#131316]/60">
             <div className="flex items-center gap-2 text-left">
-              <span className="text-xs text-slate-500 font-extrabold uppercase tracking-wider">Workspaces</span>
-              <span className="text-xs text-slate-400">/</span>
+              <span className="text-xs text-zinc-500 font-extrabold uppercase tracking-wider">Workspaces</span>
+              <span className="text-xs text-zinc-400">/</span>
               <span className="text-xs text-white font-black uppercase tracking-wider">My Workspace</span>
             </div>
             
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/40 border border-emerald-500/25 px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/40 border border-orange-500/25 px-2.5 py-1 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
                 <span>Auto-Saved Library ({localLibrary.length})</span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#ff5e00] bg-[#ff5e00]/10 border border-[#ff5e00]/20 px-2 py-0.5 rounded-full">
+              <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-full">
                 <span>● v5.5 Neural</span>
               </div>
             </div>
           </div>
 
           {/* Quick search and view controls */}
-          <div className="p-4 bg-zinc-950/20 flex flex-wrap gap-3 items-center justify-between border-b border-zinc-900">
+          <div className="p-4 bg-[#131316]/20 flex flex-wrap gap-3 items-center justify-between border-b border-white/5">
             <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-              <span className="text-slate-500 text-sm">🔍</span>
+              <span className="text-zinc-500 text-sm">🔍</span>
               <input 
                 type="text" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search songs or genres..."
-                className="bg-transparent border-none text-xs text-slate-200 outline-none w-full focus:ring-0 placeholder-slate-600"
+                className="bg-transparent border-none text-xs text-zinc-200 outline-none w-full focus:ring-0 placeholder-zinc-600"
               />
             </div>
 
@@ -557,8 +557,8 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                 onClick={() => setActiveFilter('all')} 
                 className={`px-3 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${
                   activeFilter === 'all' 
-                    ? 'bg-zinc-800 text-white border border-white/5' 
-                    : 'text-slate-500 hover:text-slate-300'
+                    ? 'bg-white/10 text-white border border-white/5' 
+                    : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
                 All
@@ -567,16 +567,16 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                 onClick={() => setActiveFilter('liked')} 
                 className={`px-3 py-1 rounded text-[9px] font-black uppercase tracking-wider transition-all ${
                   activeFilter === 'liked' 
-                    ? 'bg-zinc-800 text-[#ff5e00] border border-[#ff5e00]/25' 
-                    : 'text-slate-500 hover:text-slate-300'
+                    ? 'bg-white/10 text-orange-400 border border-orange-500/25' 
+                    : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
                 Liked
               </button>
               
-              <span className="h-4 w-px bg-zinc-800 mx-1"></span>
+              <span className="h-4 w-px bg-white/10 mx-1"></span>
               
-              <span className="text-[10px] text-slate-500 font-bold uppercase">Newest</span>
+              <span className="text-[10px] text-zinc-500 font-bold uppercase">Newest</span>
             </div>
           </div>
 
@@ -585,24 +585,24 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
             
             {/* Live Synthesis / Generating State in Center panel */}
             {activeQueueItems.map(item => (
-              <div key={item.id} className="bg-[#15151a] border border-[#ff5e00]/20 rounded-xl p-4 relative overflow-hidden animate-in zoom-in-95 text-left">
-                <div className="absolute top-0 left-0 bottom-0 bg-[#ff5e00]/5 transition-all duration-300" style={{ width: `${item.progress}%` }}></div>
+              <div key={item.id} className="bg-[#1a1a1e] border border-orange-500/20 rounded-xl p-4 relative overflow-hidden animate-in zoom-in-95 text-left">
+                <div className="absolute top-0 left-0 bottom-0 bg-orange-500/5 transition-all duration-300" style={{ width: `${item.progress}%` }}></div>
                 <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-zinc-950 border border-[#ff5e00]/20 rounded-lg flex items-center justify-center">
-                      <div className="w-4 h-4 rounded-full border-2 border-orange-500/20 border-t-[#ff5e00] animate-spin"></div>
+                    <div className="w-10 h-10 bg-[#131316] border border-orange-500/20 rounded-lg flex items-center justify-center">
+                      <div className="w-4 h-4 rounded-full border-2 border-orange-500/20 border-t-orange-500 animate-spin"></div>
                     </div>
                     <div>
                       <h4 className="text-xs font-black text-white">{item.title}</h4>
-                      <p className="text-[9px] text-[#ff5e00] uppercase font-black tracking-widest mt-0.5">{item.stage}</p>
+                      <p className="text-[9px] text-orange-400 uppercase font-black tracking-widest mt-0.5">{item.stage}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-black font-mono text-[#ffbd59]">{item.progress}%</span>
+                    <span className="text-xs font-black font-mono text-orange-400">{item.progress}%</span>
                   </div>
                 </div>
-                <div className="h-1 bg-zinc-950 rounded-full overflow-hidden mt-3 border border-white/5 relative z-10">
-                  <div className="h-full bg-gradient-to-r from-[#ff5e00] to-amber-500 rounded-full transition-all duration-300" style={{ width: `${item.progress}%` }}></div>
+                <div className="h-1 bg-[#131316] rounded-full overflow-hidden mt-3 border border-white/5 relative z-10">
+                  <div className="h-full bg-gradient-to-r from-orange-500 to-red-600 rounded-full transition-all duration-300" style={{ width: `${item.progress}%` }}></div>
                 </div>
               </div>
             ))}
@@ -610,8 +610,8 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
             {/* Empty Vault notification check */}
             {filteredTracks.length === 0 && (
               <div className="py-24 text-center space-y-3 opacity-30">
-                <span className="text-4xl text-slate-500 block">🎧</span>
-                <p className="text-xs font-black uppercase text-slate-400">Workspace Empty or No search match</p>
+                <span className="text-4xl text-zinc-500 block">🎧</span>
+                <p className="text-xs font-black uppercase text-zinc-400">Workspace Empty or No search match</p>
               </div>
             )}
 
@@ -627,14 +627,14 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     onClick={() => setSelectedTrackId(track.id)}
                     className={`p-3.5 rounded-xl border flex flex-col cursor-pointer group transition-all text-left relative ${
                       isActiveSel 
-                        ? 'bg-zinc-900 border-[#ff5e00]/30 shadow-md shadow-[#ff5e00]/5' 
+                        ? 'bg-[#1a1a1e] border-orange-500/30 shadow-md shadow-black/40' 
                         : 'bg-[#0f0f12]/50 hover:bg-[#0f0f12]/90 border-white/5'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3.5 min-w-0 flex-1">
                         {/* Playable Cover */}
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-900 border border-white/15 flex-shrink-0">
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#1a1a1e] border border-white/15 flex-shrink-0">
                           <img 
                             src={`https://picsum.photos/seed/${track.coverId || 'art'}/150/150`} 
                             alt="art" 
@@ -656,10 +656,10 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <h4 className="text-sm font-black text-white truncate max-w-[170px] sm:max-w-xs">{track.title}</h4>
-                            <span className="text-[8px] bg-zinc-950 text-slate-400 px-1 py-0.5 rounded font-black uppercase italic whitespace-nowrap">
+                            <span className="text-[8px] bg-[#131316] text-zinc-400 px-1 py-0.5 rounded font-black uppercase italic whitespace-nowrap">
                               {track.engine || 'v5.5'}
                             </span>
-                            <span className="text-[7.5px] bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
+                            <span className="text-[7.5px] bg-orange-950/80 text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider whitespace-nowrap flex items-center gap-1">
                               ✓ Auto-Saved
                             </span>
                           </div>
@@ -674,14 +674,14 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                       <div className="flex items-center gap-2 ml-4 flex-shrink-0 select-none">
                         <button 
                           onClick={(e) => toggleLike(track.id, e)}
-                          className={`text-sm py-1 px-1.5 rounded-md hover:bg-zinc-800 transition-colors ${
-                            isLiked ? 'text-[#ff5e00]' : 'text-slate-500'
+                          className={`text-sm py-1 px-1.5 rounded-md hover:bg-white/10 transition-colors ${
+                            isLiked ? 'text-orange-400' : 'text-zinc-500'
                           }`}
                         >
                           {isLiked ? '❤️' : '🤍'}
                         </button>
 
-                        <span className="text-[10px] text-slate-500 font-bold font-mono min-w-[30px] text-right">
+                        <span className="text-[10px] text-zinc-500 font-bold font-mono min-w-[30px] text-right">
                           ▶ {track.playCount || Math.floor(Math.random() * 4) + 1}
                         </span>
 
@@ -695,7 +695,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                               if (selectedTrackId === track.id) setSelectedTrackId(updated[0]?.id || null);
                             }
                           }}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors text-xs"
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-zinc-500 hover:text-red-400 hover:bg-red-950/30 transition-colors text-xs"
                           title="Delete track"
                         >
                           🗑
@@ -714,11 +714,11 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
         {/* ========================================================= */}
         {/* COLUMN 3: RIGHT DETAIL BOARD (PLAYER & SCROLLING LYRICS)  */}
         {/* ========================================================= */}
-        <div className="lg:col-span-3 bg-[#070708] border-l border-[#161619] flex flex-col min-h-0 text-left">
+        <div className="lg:col-span-3 bg-[#131316] border-l border-white/5 flex flex-col min-h-0 text-left">
           
           {/* Cover Art Banner with overlay statistics */}
           <div className="p-4 flex-shrink-0">
-            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-zinc-900 border border-white/5 shadow-2xl">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#1a1a1e] border border-white/5 shadow-2xl">
               <img 
                 src={`https://picsum.photos/seed/${activeSelectedTrack?.coverId || 'metal'}/380/220`}
                 alt="Selected cover" 
@@ -729,10 +729,10 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
               
               {/* Overlay play badges */}
               <div className="absolute bottom-3 left-3 flex gap-2">
-                <span className="text-[8px] bg-black/60 backdrop-blur text-slate-300 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                <span className="text-[8px] bg-black/60 backdrop-blur text-zinc-300 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">
                   ▶ {activeSelectedTrack?.playCount || 104} Plays
                 </span>
-                <span className="text-[8px] bg-[#ff5e00]/25 backdrop-blur text-[#ff711e] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                <span className="text-[8px] bg-orange-500/25 backdrop-blur text-orange-400 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">
                   👍 {activeSelectedTrack?.likesCount || 15} Likes
                 </span>
               </div>
@@ -744,7 +744,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     onPlay(activeSelectedTrack.title, `SwCafe v5.5`, `https://picsum.photos/seed/${activeSelectedTrack.coverId || 'metal'}/200/200`);
                   }
                 }}
-                className="absolute inset-0 m-auto h-12 w-12 rounded-full bg-gradient-to-r from-[#ff5e00] to-orange-500 text-white font-black text-xs scale-90 opacity-0 group-hover:opacity-100 transition-all hover:scale-100 flex items-center justify-center shadow-lg"
+                className="absolute inset-0 m-auto h-12 w-12 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white font-black text-xs scale-90 opacity-0 group-hover:opacity-100 transition-all hover:scale-100 flex items-center justify-center shadow-lg"
               >
                 ▶
               </button>
@@ -752,13 +752,13 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
           </div>
 
           {/* Heading Info */}
-          <div className="px-4 pb-2 border-b border-zinc-900">
+          <div className="px-4 pb-2 border-b border-white/5">
             <div className="flex justify-between items-start gap-2">
               <div>
                 <h2 className="text-base font-black text-white leading-snug uppercase tracking-tight">
                   {activeSelectedTrack?.title || 'Hurts Like Hell'}
                 </h2>
-                <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] text-orange-400 font-bold uppercase tracking-wider mt-0.5">
                   {activeSelectedTrack?.genre || 'alternativ, metalcore, atmospheric'}
                 </p>
               </div>
@@ -771,29 +771,29 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     alert(`Remix mapped to workbench!`);
                   }
                 }}
-                className="bg-zinc-900 hover:bg-zinc-800 text-slate-300 px-2 py-1.5 rounded-lg border border-white/5 text-[9px] font-black uppercase tracking-wider transition-all"
+                className="bg-[#1a1a1e] hover:bg-white/10 text-zinc-300 px-2 py-1.5 rounded-lg border border-white/5 text-[9px] font-black uppercase tracking-wider transition-all"
               >
                 Remix
               </button>
             </div>
             
             {/* Style Influence stats block */}
-            <div className="mt-3 bg-zinc-950/80 rounded-xl p-2.5 border border-white/5 space-y-2">
-              <div className="flex justify-between text-[8px] font-black text-slate-500 uppercase tracking-wide">
+            <div className="mt-3 bg-[#131316]/80 rounded-xl p-2.5 border border-white/5 space-y-2">
+              <div className="flex justify-between text-[8px] font-black text-zinc-500 uppercase tracking-wide">
                 <span>Influence Metrics</span>
-                <span className="text-[#ff5e00]">v5.5 Calibrated</span>
+                <span className="text-orange-400">v5.5 Calibrated</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-zinc-900/60 p-1 rounded border border-white/5">
-                  <p className="text-[8px] text-slate-500 uppercase">Style</p>
+                <div className="bg-[#1a1a1e]/60 p-1 rounded border border-white/5">
+                  <p className="text-[8px] text-zinc-500 uppercase">Style</p>
                   <p className="text-[9px] font-mono font-black text-white">86%</p>
                 </div>
-                <div className="bg-zinc-900/60 p-1 rounded border border-white/5">
-                  <p className="text-[8px] text-slate-500 uppercase">Audio</p>
+                <div className="bg-[#1a1a1e]/60 p-1 rounded border border-white/5">
+                  <p className="text-[8px] text-zinc-500 uppercase">Audio</p>
                   <p className="text-[9px] font-mono font-black text-white">15%</p>
                 </div>
-                <div className="bg-zinc-900/60 p-1 rounded border border-white/5">
-                  <p className="text-[8px] text-slate-500 uppercase">Weird</p>
+                <div className="bg-[#1a1a1e]/60 p-1 rounded border border-white/5">
+                  <p className="text-[8px] text-zinc-500 uppercase">Weird</p>
                   <p className="text-[9px] font-mono font-black text-white">9%</p>
                 </div>
               </div>
@@ -801,8 +801,8 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
           </div>
 
           {/* Formatted Scrolling lyric sheet */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 text-xs leading-relaxed italic text-slate-300 font-sans space-y-4">
-            <div className="text-slate-500 font-bold uppercase tracking-widest text-[9px] not-italic mb-2">Lyric Feed</div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 text-xs leading-relaxed italic text-zinc-300 font-sans space-y-4">
+            <div className="text-zinc-500 font-bold uppercase tracking-widest text-[9px] not-italic mb-2">Lyric Feed</div>
             {activeSelectedTrack?.lyrics ? (
               activeSelectedTrack.lyrics.split('\n').map((line: string, i: number) => {
                 const isHeading = line.startsWith('[');
@@ -811,8 +811,8 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                     key={i} 
                     className={`${
                       isHeading 
-                        ? 'text-[#ff5e00] font-black not-italic text-[10px] uppercase tracking-wider mt-4 mb-2' 
-                        : 'text-slate-300/90 hover:text-white transition-colors duration-200'
+                        ? 'text-orange-400 font-black not-italic text-[10px] uppercase tracking-wider mt-4 mb-2' 
+                        : 'text-zinc-300/90 hover:text-white transition-colors duration-200'
                     }`}
                   >
                     {line}
@@ -820,7 +820,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                 );
               })
             ) : (
-              <p className="text-slate-600 italic">No lyrics mapped for this track.</p>
+              <p className="text-zinc-600 italic">No lyrics mapped for this track.</p>
             )}
           </div>
 

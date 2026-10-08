@@ -137,23 +137,23 @@ const AudioMixerRoom: React.FC = () => {
     <div className="h-full flex flex-col gap-6 animate-in slide-in-from-bottom-6 duration-500 overflow-hidden" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
       <header className="flex justify-between items-center bg-white/5 p-6 rounded-[2.5rem] border border-white/5 shadow-2xl">
         <div className="space-y-1">
-          <h2 className="text-2xl font-black tracking-tight uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">Master Production Hub</h2>
-          <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em]">Engineered for Professional Excellence</p>
+          <h2 className="text-2xl font-semibold tracking-tight uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">Master Production Hub</h2>
+          <p className="text-[10px] text-zinc-500 font-semibold uppercase tracking-tight">Engineered for Professional Excellence</p>
         </div>
         <div className="flex gap-4 items-center">
           <div className="bg-black/40 px-6 py-2 rounded-2xl border border-white/5 flex items-center gap-4">
-             <div className={`w-2 h-2 rounded-full transition-all duration-75 ${flash ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-emerald-900'}`}></div>
-             <span className="text-xs font-mono text-emerald-400 tabular-nums font-black">{bpm} BPM</span>
+             <div className={`w-2 h-2 rounded-full transition-all duration-75 ${flash ? 'bg-orange-500 shadow-black/40' : 'bg-orange-950'}`}></div>
+             <span className="text-xs font-mono text-orange-400 tabular-nums font-black">{bpm} BPM</span>
           </div>
-          <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">Final Export</button>
+          <button className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">Final Export</button>
         </div>
       </header>
 
       <div className="flex-1 grid grid-cols-12 gap-6 min-h-0">
         <div className="col-span-8 flex flex-col gap-6 min-h-0">
-          <div className="bg-[#111] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl flex-grow">
+          <div className="bg-[#131316] rounded-[2.5rem] border border-white/5 flex flex-col overflow-hidden shadow-2xl flex-grow">
             <div className="p-6 border-b border-white/5 flex justify-between items-center">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Multichannel Console</h3>
+              <h3 className="text-xs font-semibold tracking-tight text-zinc-500">Multichannel Console</h3>
               <div className="flex gap-4">
                  <span className="text-[9px] font-black text-[#FF6B6B] animate-pulse">● MASTER BUS LINKED</span>
               </div>
@@ -164,10 +164,10 @@ const AudioMixerRoom: React.FC = () => {
                 <div 
                   key={chan} 
                   onClick={() => setActiveChannel(chan)}
-                  className={`flex-1 min-w-[120px] flex flex-col items-center p-5 rounded-[2rem] transition-all cursor-pointer group relative overflow-hidden ${activeChannel === chan ? 'bg-[#FF6B6B]/10 border-2 border-[#FF6B6B] shadow-[0_0_30px_#FF6B6B15]' : 'bg-white/5 border border-white/5 hover:bg-white/[0.08]'}`}
+                  className={`flex-1 min-w-[120px] flex flex-col items-center p-5 rounded-[2rem] transition-all cursor-pointer group relative overflow-hidden ${activeChannel === chan ? 'bg-orange-500/10 border-2 border-orange-500/60 shadow-black/40' : 'bg-white/5 border border-white/5 hover:bg-white/[0.08]'}`}
                 >
                   <div className="text-center mb-6 z-10">
-                    <span className={`text-[10px] font-black uppercase tracking-tighter ${activeChannel === chan ? 'text-[#FF6B6B]' : 'text-slate-400'}`}>{chan}</span>
+                    <span className={`text-[10px] font-black uppercase tracking-tighter ${activeChannel === chan ? 'text-orange-400' : 'text-zinc-400'}`}>{chan}</span>
                   </div>
                   
                   <div className="flex-1 flex flex-col items-center justify-center relative w-full mb-6 z-10 px-2">
@@ -185,7 +185,7 @@ const AudioMixerRoom: React.FC = () => {
                         </div>
                      </div>
 
-                     <div className="w-1.5 h-full bg-black rounded-full shadow-inner ml-4 relative z-10"></div>
+                     <div className="w-1.5 h-full bg-white/10 rounded-full shadow-inner ml-4 relative z-10"></div>
                      <input type="range" min="0" max="100" value={faders[chan]} onChange={(e) => handleFaderChange(chan, parseInt(e.target.value))} className="absolute w-44 -rotate-90 origin-center cursor-pointer appearance-none bg-transparent fader-thumb-custom ml-4 z-20" />
                   </div>
 
@@ -197,30 +197,30 @@ const AudioMixerRoom: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-[#111] rounded-[2rem] border border-white/5 p-8 shadow-2xl flex items-center justify-between">
+          <div className="bg-[#131316] rounded-[2rem] border border-white/5 p-8 shadow-2xl flex items-center justify-between">
               <div className="flex-1 max-w-lg space-y-4">
                   <div className="flex justify-between items-center px-1">
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Global Master Tempo</p>
+                    <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Global Master Tempo</p>
                     <span className="text-[11px] font-black text-[#FFE66D] font-mono">{bpm} BPM</span>
                   </div>
-                  <input type="range" min="40" max="220" value={bpm} onChange={(e) => setBpm(parseInt(e.target.value))} className="w-full h-1.5 bg-black rounded-full appearance-none cursor-pointer accent-[#FF6B6B]" />
+                  <input type="range" min="40" max="220" value={bpm} onChange={(e) => setBpm(parseInt(e.target.value))} className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-orange-500" />
               </div>
               <div className="flex gap-4 ml-12">
                  {['Sync', 'Quantize', 'Lock'].map(ctrl => (
-                   <button key={ctrl} className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[8px] font-black uppercase hover:border-[#FF6B6B] transition-all">{ctrl}</button>
+                   <button key={ctrl} className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[8px] font-black uppercase hover:border-orange-500 transition-all">{ctrl}</button>
                  ))}
               </div>
           </div>
         </div>
 
         <div className="col-span-4 flex flex-col gap-6">
-          <div className="bg-slate-900 rounded-[2.5rem] border border-white/5 p-8 shadow-2xl space-y-6 flex flex-col h-full overflow-hidden">
-            <div className="flex bg-black/40 p-1 rounded-2xl border border-white/5">
+          <div className="bg-[#131316] rounded-[2.5rem] border border-white/5 p-8 shadow-2xl space-y-6 flex flex-col h-full overflow-hidden">
+            <div className="flex bg-[#131316]/40 p-1 rounded-2xl border border-white/5">
                 {(['eq', 'dynamics', 'effects', 'chords'] as const).map(t => (
                     <button
                         key={t}
                         onClick={() => setActiveTab(t)}
-                        className={`flex-1 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-[#FF6B6B] text-black shadow-lg shadow-[#FF6B6B]/20' : 'text-slate-500 hover:text-white'}`}
+                        className={`flex-1 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all ${activeTab === t ? 'bg-gradient-to-r from-orange-500 to-red-600 text-black shadow-lg shadow-black/40' : 'text-zinc-500 hover:text-white'}`}
                     >
                         {t === 'chords' ? 'Chord Wheel' : t}
                     </button>
@@ -230,8 +230,8 @@ const AudioMixerRoom: React.FC = () => {
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
                 {activeTab === 'eq' && (
                     <div className="space-y-6 animate-in fade-in duration-300">
-                        <header className="flex justify-between items-center px-1"><h4 className="text-xs font-black uppercase tracking-widest text-[#FF6B6B]">Parametric EQ</h4></header>
-                        <div ref={eqContainerRef} className="h-48 bg-black rounded-3xl border border-white/5 relative overflow-hidden group shadow-inner">
+                        <header className="flex justify-between items-center px-1"><h4 className="text-xs font-semibold tracking-tight text-orange-400">Parametric EQ</h4></header>
+                        <div ref={eqContainerRef} className="h-48 bg-[#131316] rounded-3xl border border-white/5 relative overflow-hidden group shadow-inner">
                            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                               <path d={generatePath()} fill="url(#eq-grad)" fillOpacity="0.1" />
                               <path d={generatePath()} fill="none" stroke="#FF6B6B" strokeWidth="1" className="animate-pulse" />
@@ -248,8 +248,8 @@ const AudioMixerRoom: React.FC = () => {
 
                 {activeTab === 'effects' && (
                     <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-                        <header className="flex justify-between items-center px-1"><h4 className="text-xs font-black uppercase tracking-widest text-blue-400">Vocal Pitch Engine</h4></header>
-                        <div className="bg-black/40 rounded-3xl p-6 border border-white/5 space-y-8">
+                        <header className="flex justify-between items-center px-1"><h4 className="text-xs font-semibold tracking-tight text-orange-400">Vocal Pitch Engine</h4></header>
+                        <div className="bg-[#131316]/40 rounded-3xl p-6 border border-white/5 space-y-8">
                             <div className="flex justify-around">
                                 {[{ l: 'Retune Speed', v: pitchConfig.retuneSpeed, vScale: pitchConfig.retuneSpeed, c: '#3b82f6' }, { l: 'Humanize', v: pitchConfig.humanize, vScale: pitchConfig.humanize, c: '#a78bfa' }].map(knob => (
                                     <div key={knob.l} className="flex flex-col items-center gap-2">
@@ -263,11 +263,11 @@ const AudioMixerRoom: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                <div className="space-y-2"><p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Target Key</p>
-                               <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-[10px] font-black text-white focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer">
+                               <select className="w-full bg-[#131316] border-white/10 rounded-2xl p-3 text-[10px] font-black text-white focus:ring-1 focus:ring-orange-500 outline-none appearance-none cursor-pointer">
                                   {['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'].map(k => <option key={k}>{k}</option>)}
                                </select></div>
                                <div className="space-y-2"><p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Scale</p>
-                               <select className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-[10px] font-black text-white focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer">
+                               <select className="w-full bg-[#131316] border-white/10 rounded-2xl p-3 text-[10px] font-black text-white focus:ring-1 focus:ring-orange-500 outline-none appearance-none cursor-pointer">
                                   {['Major', 'Minor', 'Dorian', 'Phrygian', 'Chromatic'].map(k => <option key={k}>{k}</option>)}
                                </select></div>
                             </div>
@@ -277,7 +277,7 @@ const AudioMixerRoom: React.FC = () => {
 
                 {activeTab === 'chords' && (
                     <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
-                        <header className="flex justify-between items-center px-1"><h4 className="text-xs font-black uppercase tracking-widest text-emerald-400">Harmonic Wheel</h4></header>
+                        <header className="flex justify-between items-center px-1"><h4 className="text-xs font-semibold tracking-tight text-orange-400">Harmonic Wheel</h4></header>
                         <div className="aspect-square bg-black rounded-full border border-white/5 relative p-4 flex items-center justify-center overflow-hidden shadow-2xl">
                            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 to-transparent pointer-events-none"></div>
                            <svg className="w-full h-full" viewBox="0 0 100 100">
@@ -295,9 +295,9 @@ const AudioMixerRoom: React.FC = () => {
             </div>
 
             <div className="pt-6 border-t border-white/5 space-y-6">
-                <div className="flex-1 overflow-y-auto custom-scrollbar max-h-32 bg-black/20 rounded-2xl p-4 border border-white/5">
+                <div className="flex-1 overflow-y-auto custom-scrollbar max-h-32 bg-[#131316]/40 rounded-2xl p-4 border border-white/5">
                    {advice ? (
-                     <p className="text-[10px] leading-relaxed text-slate-400 font-medium italic animate-in fade-in duration-700">"{advice}"</p>
+                     <p className="text-[10px] leading-relaxed text-zinc-400 font-medium italic animate-in fade-in duration-700">"{advice}"</p>
                    ) : (
                      <div className="h-full flex flex-col items-center justify-center text-center opacity-20 gap-2">
                         <span className="text-2xl">🧠</span>
@@ -308,7 +308,7 @@ const AudioMixerRoom: React.FC = () => {
                 <button 
                    onClick={getAIAdvice}
                    disabled={isAsking}
-                   className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-black py-4 rounded-2xl text-[9px] uppercase tracking-widest shadow-xl transition-all disabled:opacity-50"
+                   className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white font-black py-4 rounded-2xl text-[9px] uppercase tracking-widest shadow-xl transition-all disabled:opacity-50"
                 >
                    {isAsking ? 'Thinking...' : `Consult Signal Engine`}
                 </button>

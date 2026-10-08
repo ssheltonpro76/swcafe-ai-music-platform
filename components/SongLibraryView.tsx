@@ -91,11 +91,11 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
     <div className="max-w-[1400px] mx-auto space-y-12 animate-in fade-in duration-700 pb-32 relative">
       <header className="flex flex-col md:flex-row justify-between items-end gap-6">
         <div className="space-y-2">
-          <h1 className="text-5xl font-black uppercase tracking-tighter italic">Studio <span className="text-[#4facfe]">Archive</span></h1>
+          <h1 className="text-5xl font-semibold tracking-tight italic">Studio <span className="text-orange-400">Archive</span></h1>
           <div className="flex items-center gap-3 flex-wrap">
-            <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em]">Vaulting your SwCafe v5.5 Generations</p>
-            <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.4em]">Vaulting your SwCafe v5.5 Generations</p>
+            <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/40 border border-orange-500/30 px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
               <span>Real-Time Auto-Save Active</span>
             </div>
           </div>
@@ -106,9 +106,9 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
             placeholder="Search your library..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold outline-none focus:ring-2 focus:ring-[#4facfe] transition-all"
+            className="w-full bg-[#131316] border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold outline-none focus:ring-2 focus:ring-orange-500 transition-all"
           />
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">🔍</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">🔍</span>
         </div>
       </header>
 
@@ -116,8 +116,8 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
         <div className="h-[500px] flex flex-col items-center justify-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[3rem] text-center gap-6">
           <span className="text-8xl grayscale opacity-20">🎼</span>
           <div className="space-y-2">
-            <h3 className="text-xl font-black uppercase text-slate-500">Your archive is empty</h3>
-            <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">Generate songs in the Studio or Chujai Lab to begin vaulting.</p>
+            <h3 className="text-xl font-black uppercase text-zinc-500">Your archive is empty</h3>
+            <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">Generate songs in the Studio or Chujai Lab to begin vaulting.</p>
           </div>
         </div>
       ) : (
@@ -125,7 +125,7 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
           {filteredSongs.map((song) => (
             <div 
               key={song.id} 
-              className="group bg-[#111] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-[#4facfe]/50 transition-all shadow-2xl flex flex-col relative"
+              className="group bg-[#1a1a1e] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-orange-500/50 transition-all shadow-2xl flex flex-col relative"
             >
               {/* Context Menu Button */}
               <button 
@@ -137,14 +137,14 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
 
               {/* Context Dropdown */}
               {menuOpenId === song.id && (
-                <div className="absolute top-16 right-6 z-40 w-48 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="absolute top-16 right-6 z-40 w-48 bg-[#1a1a1e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                   <button onClick={() => { setEditingSong(song); setMenuOpenId(null); }} className="w-full px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">Song Details</button>
                   <button 
                     onClick={() => { 
                       if (onReplaceSection) onReplaceSection(song);
                       setMenuOpenId(null);
                     }} 
-                    className="w-full px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest hover:bg-[#FFE66D]/10 hover:text-[#FFE66D] transition-all border-b border-white/5"
+                    className="w-full px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest hover:bg-orange-500/10 hover:text-orange-400 transition-all border-b border-white/5"
                   >
                     Edit {' > '} Replace Section
                   </button>
@@ -175,23 +175,23 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
                 
                 {song.videoArt && (
-                  <div className="absolute top-6 left-6 flex items-center gap-2 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 px-3 py-1 rounded-lg">
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">V4 VIDEO ART</span>
+                  <div className="absolute top-6 left-6 flex items-center gap-2 bg-orange-500/20 backdrop-blur-md border border-orange-500/30 px-3 py-1 rounded-lg">
+                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
+                    <span className="text-[8px] font-black uppercase tracking-widest text-orange-400">V4 VIDEO ART</span>
                   </div>
                 )}
 
                 <div className="absolute bottom-8 left-8 right-8">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="bg-[#4facfe] text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest inline-block shadow-lg">
+                    <span className="bg-red-500/15 text-red-400 px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest inline-block shadow-lg">
                       {song.engine}
                     </span>
-                    <span className="bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider inline-flex items-center gap-1 shadow-md">
+                    <span className="bg-orange-950/80 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase tracking-wider inline-flex items-center gap-1 shadow-md">
                       ✓ Auto-Saved
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black uppercase truncate text-white tracking-tighter mb-1">{song.title}</h3>
-                   <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400">
+                  <h3 className="text-2xl font-semibold tracking-tight truncate text-white mb-1">{song.title}</h3>
+                   <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-zinc-400">
                     <span>{song.genre}</span>
                     <span>{new Date(song.createdAt).toLocaleDateString()}</span>
                   </div>
@@ -205,15 +205,15 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
       {/* Lyrics View Modal */}
       {selectedSong && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="bg-[#0f0f0f] w-full max-w-3xl rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-[#131316] w-full max-w-3xl rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <header className="p-10 border-b border-white/5 flex justify-between items-center bg-white/5">
               <div className="space-y-1">
-                 <h3 className="text-2xl font-black uppercase tracking-tighter text-[#4facfe]">{selectedSong.title}</h3>
-                 <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{selectedSong.genre} • {selectedSong.engine}</p>
+                 <h3 className="text-2xl font-semibold tracking-tight text-orange-400">{selectedSong.title}</h3>
+                 <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">{selectedSong.genre} • {selectedSong.engine}</p>
               </div>
               <button 
                 onClick={() => setSelectedSong(null)} 
-                className="text-slate-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
+                className="text-zinc-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
               >
                 ✕
               </button>
@@ -222,11 +222,11 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
               <div className="space-y-8">
                 {selectedSong.theme && (
                   <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
-                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Conceptual Theme</p>
-                    <p className="text-sm font-medium italic text-slate-300">"{selectedSong.theme}"</p>
+                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest mb-2">Conceptual Theme</p>
+                    <p className="text-sm font-medium italic text-zinc-300">"{selectedSong.theme}"</p>
                   </div>
                 )}
-                <div className="text-lg leading-loose italic text-slate-300 font-medium whitespace-pre-wrap">
+                <div className="text-lg leading-loose italic text-zinc-300 font-medium whitespace-pre-wrap">
                   {selectedSong.lyrics}
                 </div>
               </div>
@@ -249,15 +249,15 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
       {/* Song Details / Video Upload Modal */}
       {editingSong && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-           <div className="bg-[#0f0f0f] w-full max-w-4xl rounded-[3.5rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+           <div className="bg-[#131316] w-full max-w-4xl rounded-[3.5rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
               <header className="p-10 border-b border-white/5 flex justify-between items-center bg-white/5">
                  <div className="space-y-1">
-                    <h3 className="text-2xl font-black uppercase tracking-tighter text-[#FFE66D]">Media Settings</h3>
-                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest italic">{editingSong.title}</p>
+                    <h3 className="text-2xl font-semibold tracking-tight text-orange-400">Media Settings</h3>
+                    <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest italic">{editingSong.title}</p>
                  </div>
                  <button 
                   onClick={() => setEditingSong(null)} 
-                  className="text-slate-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
+                  className="text-zinc-500 hover:text-white bg-white/5 p-4 rounded-full transition-all"
                 >
                   ✕
                 </button>
@@ -267,7 +267,7 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Visual Preview */}
                     <div className="space-y-6">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Looping Art Preview</label>
+                       <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">Looping Art Preview</label>
                        <div className="aspect-[9/16] bg-black rounded-[2.5rem] border border-white/10 overflow-hidden relative shadow-inner group">
                           {editingSong.videoArt ? (
                              <video 
@@ -298,16 +298,16 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
                     <div className="space-y-10">
                        <div className="space-y-6">
                           <h4 className="text-sm font-black uppercase tracking-widest text-white">Visual Synthesis</h4>
-                          <p className="text-xs text-slate-500 leading-relaxed italic">
+                          <p className="text-xs text-zinc-500 leading-relaxed italic">
                             "Make your track come to life on web and mobile. Upload a looping video art piece to replace static covers."
                           </p>
                           <div className="bg-white/5 p-6 rounded-2xl border border-white/5 space-y-4">
-                             <p className="text-[9px] font-black text-[#FFE66D] uppercase tracking-widest">Requirement Checklist</p>
+                             <p className="text-[9px] font-black text-orange-400 uppercase tracking-widest">Requirement Checklist</p>
                              <ul className="space-y-2">
-                                <li className="text-[10px] text-slate-400 flex items-center gap-2"><span>✅</span> MP4 Format</li>
-                                <li className="text-[10px] text-slate-400 flex items-center gap-2"><span>✅</span> 10 seconds or less</li>
-                                <li className="text-[10px] text-slate-400 flex items-center gap-2"><span>✅</span> 9:16 Aspect Ratio</li>
-                                <li className="text-[10px] text-slate-400 flex items-center gap-2"><span>✅</span> 720px Minimum Height</li>
+                                <li className="text-[10px] text-zinc-400 flex items-center gap-2"><span>✅</span> MP4 Format</li>
+                                <li className="text-[10px] text-zinc-400 flex items-center gap-2"><span>✅</span> 10 seconds or less</li>
+                                <li className="text-[10px] text-zinc-400 flex items-center gap-2"><span>✅</span> 9:16 Aspect Ratio</li>
+                                <li className="text-[10px] text-zinc-400 flex items-center gap-2"><span>✅</span> 720px Minimum Height</li>
                              </ul>
                           </div>
                        </div>
@@ -322,7 +322,7 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
                           />
                           <button 
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-full bg-[#4facfe] text-white py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-[#4facfe]/20 hover:scale-[1.01] active:scale-95 transition-all"
+                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-black/40 hover:scale-[1.01] active:scale-95 transition-all"
                           >
                             Upload Video Art
                           </button>
@@ -342,7 +342,7 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
 
                        <div className="pt-8 border-t border-white/5 space-y-4">
                           <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Display Title</label>
+                            <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">Display Title</label>
                             <input 
                               type="text" 
                               value={editingSong.title}
@@ -352,7 +352,7 @@ const SongLibraryView: React.FC<SongLibraryViewProps> = ({ onReplaceSection }) =
                                 saveToStorage(updated);
                                 setEditingSong({ ...editingSong, title: val });
                               }}
-                              className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-[#FFE66D] outline-none"
+                              className="w-full bg-[#131316] border border-white/10 rounded-xl p-4 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none"
                             />
                           </div>
                        </div>
