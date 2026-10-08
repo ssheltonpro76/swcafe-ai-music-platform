@@ -33,11 +33,20 @@ const App: React.FC = () => {
   const [replaceContext, setReplaceContext] = useState<any>(null);
   const [creatorInitialData, setCreatorInitialData] = useState<any>(null);
 
-  const [currentTrack, setCurrentTrack] = useState({
+  const [currentTrack, setCurrentTrack] = useState<{
+    title: string;
+    artist: string;
+    cover: string;
+    audioUrl?: string;
+  }>({
     title: "Cosmic Waves v4",
     artist: "SwCafe AI",
     cover: "https://picsum.photos/seed/music/200/200"
   });
+
+  const handlePlay = (title: string, artist: string, cover: string, audioUrl?: string) => {
+    setCurrentTrack({ title, artist, cover, audioUrl });
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem('voicePersonas');
@@ -70,14 +79,14 @@ const App: React.FC = () => {
     switch (activeTab) {
       case 'home': return <HomeView onOpenVoice={() => setIsVoiceModalOpen(true)} onNavigate={setActiveTab} />;
       case 'explore': return <HomeView onOpenVoice={() => setIsVoiceModalOpen(true)} onNavigate={setActiveTab} />;
-      case 'profile': return <ProfileView onPlay={(title, artist, cover) => setCurrentTrack({ title, artist, cover })} onNavigate={setActiveTab} />;
-      case 'carplay': return <CarPlayView onPlay={(title, artist, cover) => setCurrentTrack({ title, artist, cover })} />;
+      case 'profile': return <ProfileView onPlay={handlePlay} onNavigate={setActiveTab} />;
+      case 'carplay': return <CarPlayView onPlay={handlePlay} />;
       case 'studio': return <StudioView onOpenVoice={() => setIsVoiceModalOpen(true)} />;
       case 'remaster': return <RemasterView />;
       case 'song-creator': return (
         <SongCreatorView 
           initialData={creatorInitialData} 
-          onPlay={(title, artist, cover) => setCurrentTrack({ title, artist, cover })} 
+          onPlay={handlePlay} 
           onOpenLyricStudio={() => setActiveTab('lyrics-studio')}
         />
       );
@@ -178,7 +187,7 @@ const App: React.FC = () => {
         </main>
       </div>
 
-      <Player track={currentTrack} />
+      <Player track={currentTrack} onPlay={handlePlay} />
 
       <VoiceModal 
         isOpen={isVoiceModalOpen} 
