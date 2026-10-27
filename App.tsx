@@ -81,7 +81,7 @@ const App: React.FC = () => {
       case 'explore': return <HomeView onOpenVoice={() => setIsVoiceModalOpen(true)} onNavigate={setActiveTab} />;
       case 'profile': return <ProfileView onPlay={handlePlay} onNavigate={setActiveTab} />;
       case 'carplay': return <CarPlayView onPlay={handlePlay} />;
-      case 'studio': return <StudioView onOpenVoice={() => setIsVoiceModalOpen(true)} />;
+      case 'studio': return <StudioView onOpenVoice={() => setIsVoiceModalOpen(true)} onPlay={handlePlay} />;
       case 'remaster': return <RemasterView />;
       case 'song-creator': return (
         <SongCreatorView 
