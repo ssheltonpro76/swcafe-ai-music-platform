@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { suggestLyricsChujai, continueLyricsWithAI, polishLyricsWithAI } from '../geminiService';
 import { autoSaveSongToLibrary, getSavedSongsWithRecalled, SavedSong } from '../songs';
 
@@ -24,12 +24,22 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
   // Core Data State
   const [title, setTitle] = useState(initialData?.title || '');
   const [theme, setTheme] = useState('');
-  const [genre, setGenre] = useState(initialData?.genre || 'alternativ, metalcore, atmospheric');
+  const [genre, setGenre] = useState(initialData?.genre || 'alternative, metalcore, atmospheric');
   const [lyrics, setLyrics] = useState(initialData?.lyrics || '');
   const [isCustom, setIsCustom] = useState(Boolean(initialData?.lyrics));
   const [isProcessing, setIsProcessing] = useState(false);
   const [isGeneratingLyrics, setIsGeneratingLyrics] = useState(false);
   const [isContinuingLyrics, setIsContinuingLyrics] = useState(false);
+
+  // Track length for the next generation (seconds). MusicGen bills by time,
+  // and longer tracks take proportionally longer to compose.
+  const [duration, setDuration] = useState(30);
+  const DURATION_OPTIONS = [15, 30, 60, 120];
+
+  // Cancellation for the in-flight generation. Refs so the queue's Cancel
+  // button can signal the polling loop without re-rendering it.
+  const cancelRequestedRef = useRef(false);
+  const activePredictionIdRef = useRef<string | null>(null);
 
   // Search and Filter states for Center Workspace
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,15 +124,32 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
     return saved;
   };
 
+  // Cancel the in-flight generation. Sets the flag the polling loop checks
+  // and best-effort stops the prediction server-side if it has started.
+  const handleCancelGeneration = () => {
+    cancelRequestedRef.current = true;
+    const id = activePredictionIdRef.current;
+    if (id) {
+      fetch('/.netlify/functions/generate-music', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', id }),
+      }).catch(() => {});
+    }
+  };
+
   // Real AI generation: browser -> Netlify function -> Replicate MusicGen.
   // The REPLICATE_API_TOKEN lives only in the Netlify function env; the
   // browser never sees it. Progress shown below is real (create + poll).
   const handleGenerate = async () => {
     const finalTheme = theme.trim() || 'A heavy metalcore atmospheric anthem about memories fading';
     const finalTitle = title.trim() || 'Hurts Like Hell';
-    const finalGenre = genre || 'alternativ, metalcore, atmospheric';
+    const finalGenre = genre || 'alternative, metalcore, atmospheric';
+    const finalDuration = duration;
 
     setIsProcessing(true);
+    cancelRequestedRef.current = false;
+    activePredictionIdRef.current = null;
 
     const itemId = Math.random().toString();
     const coverId = Math.floor(Math.random() * 1000);
@@ -144,6 +171,13 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
       setTimeout(() => setAutoSaveToast(null), 7000);
     };
 
+    const cancelGeneration = () => {
+      setActiveQueueItems([]);
+      setIsProcessing(false);
+      setAutoSaveToast('Generation cancelled.');
+      setTimeout(() => setAutoSaveToast(null), 5000);
+    };
+
     const ENGINE_URL = '/.netlify/functions/generate-music';
 
     try {
@@ -158,13 +192,17 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
       setLyrics(gLyrics);
       if (!title) setTitle(finalTitle);
 
-      // Build the music prompt from title + genre + description (+ lyric mood).
-      const lyricMood = (isCustom && lyrics.trim() ? lyrics : gLyrics)
+      // Build the music prompt: genre first (MusicGen keys on style), then
+      // the description and title, then a short mood excerpt from the
+      // lyrics. MusicGen is instrumental-only, so lyrics are mood input
+      // here, not vocals — raw lyric lines are kept short on purpose.
+      const lyricExcerpt = (isCustom && lyrics.trim() ? lyrics : gLyrics)
         .split('\n')
         .filter(l => l.trim() && !l.trim().startsWith('['))
-        .slice(0, 4)
-        .join(' ');
-      const musicPrompt = `${finalTitle}. ${finalGenre} instrumental track. ${finalTheme}.${lyricMood ? ` Lyrical mood: ${lyricMood}` : ''}`.slice(0, 900);
+        .slice(0, 2)
+        .join(' ')
+        .slice(0, 200);
+      const musicPrompt = `${finalGenre} instrumental track: ${finalTheme}. Titled "${finalTitle}".${lyricExcerpt ? ` Mood: ${lyricExcerpt}` : ''}`.slice(0, 900);
 
       // 1) Ask the function to start a MusicGen prediction.
       setQueueStage(10, 'Sending to AI engine…');
@@ -173,7 +211,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
         createRes = await fetch(ENGINE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'create', prompt: musicPrompt, duration: 30 }),
+          body: JSON.stringify({ action: 'create', prompt: musicPrompt, duration: finalDuration }),
         });
       } catch {
         failGeneration('AI engine not connected — deploy to Netlify first (see DEPLOY.md)');
@@ -188,17 +226,31 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
         failGeneration(created?.error || `AI engine error (${createRes.status}). Check REPLICATE_API_TOKEN in Netlify.`);
         return;
       }
+      activePredictionIdRef.current = created.id;
+      if (cancelRequestedRef.current) {
+        cancelGeneration();
+        return;
+      }
 
-      // 2) Poll for completion: every 4s, up to 5 minutes.
-      setQueueStage(22, 'Composing your track… (this takes ~1–2 min)');
-      const deadline = Date.now() + 5 * 60 * 1000;
+      // 2) Poll for completion: every 4s. The deadline scales with track
+      // length (longer tracks take longer to compose) with a 5-min floor.
+      // A few consecutive poll hiccups are tolerated before giving up.
+      const timeHint = finalDuration <= 30 ? '~1–2 min' : finalDuration <= 60 ? '~2–4 min' : '~4–8 min';
+      const timeoutMinutes = Math.max(5, Math.ceil((finalDuration * 4) / 60));
+      setQueueStage(22, `Composing your track… (this takes ${timeHint})`);
+      const deadline = Date.now() + Math.max(5 * 60 * 1000, finalDuration * 4 * 1000);
       let pollCount = 0;
+      let consecutivePollErrors = 0;
       let audioUrl: string | null = null;
 
       while (Date.now() < deadline) {
         await new Promise(resolve => setTimeout(resolve, 4000));
+        if (cancelRequestedRef.current) {
+          cancelGeneration();
+          return;
+        }
         pollCount += 1;
-        setQueueStage(Math.min(24 + pollCount * 2, 92), 'Composing your track… (this takes ~1–2 min)');
+        setQueueStage(Math.min(24 + pollCount * 2, 92), `Composing your track… (this takes ${timeHint})`);
 
         let statusRes: Response;
         try {
@@ -208,14 +260,25 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
             body: JSON.stringify({ action: 'status', id: created.id }),
           });
         } catch {
-          failGeneration('Lost connection to the AI engine. Please try again.');
-          return;
+          consecutivePollErrors += 1;
+          if (consecutivePollErrors >= 3) {
+            failGeneration('Lost connection to the AI engine. Please try again.');
+            return;
+          }
+          setQueueStage(Math.min(24 + pollCount * 2, 92), 'Reconnecting to AI engine…');
+          continue;
         }
         const statusData = await statusRes.json().catch(() => null);
         if (!statusRes.ok) {
-          failGeneration(statusData?.error || `AI engine error (${statusRes.status}).`);
-          return;
+          consecutivePollErrors += 1;
+          if (consecutivePollErrors >= 3) {
+            failGeneration(statusData?.error || `AI engine error (${statusRes.status}).`);
+            return;
+          }
+          setQueueStage(Math.min(24 + pollCount * 2, 92), 'Reconnecting to AI engine…');
+          continue;
         }
+        consecutivePollErrors = 0;
 
         const st = statusData?.status;
         if (st === 'succeeded') {
@@ -233,7 +296,7 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
       }
 
       if (!audioUrl) {
-        failGeneration('Generation timed out after 5 minutes. Please try again.');
+        failGeneration(`Generation timed out after ${timeoutMinutes} minutes. Please try again.`);
         return;
       }
 
@@ -450,11 +513,11 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                 type="text" 
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
-                placeholder="alternativ, metalcore, atmospheric"
+                placeholder="alternative, metalcore, atmospheric"
                 className="w-full bg-[#1a1a1e]/50 border border-white/5 hover:border-white/10 rounded-xl p-3 font-sans text-xs text-white focus:outline-none focus:border-orange-500/40 transition-all font-bold"
               />
               <div className="flex flex-wrap gap-1.5 pt-1.5">
-                {['alternativ', 'metalcore', 'lofi beats', 'synthwave', 'rock', 'atmospheric'].map(pill => (
+                {['alternative', 'metalcore', 'lofi beats', 'synthwave', 'rock', 'atmospheric'].map(pill => (
                   <button 
                     key={pill} 
                     onClick={() => {
@@ -467,6 +530,28 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Track Length (generation duration) */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">Track Length</label>
+              <div className="flex flex-wrap gap-1.5">
+                {DURATION_OPTIONS.map(sec => (
+                  <button
+                    key={sec}
+                    onClick={() => setDuration(sec)}
+                    disabled={isProcessing}
+                    className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all disabled:opacity-50 ${
+                      duration === sec
+                        ? 'bg-white/10 text-orange-400 border-orange-500/25'
+                        : 'bg-[#1a1a1e] text-zinc-400 hover:text-white border-white/5'
+                    }`}
+                  >
+                    {sec}s
+                  </button>
+                ))}
+              </div>
+              <p className="text-[9px] text-zinc-600 font-semibold">Longer tracks take longer to compose.</p>
             </div>
 
             {/* Lyrics Editor Box (Only shown if Custom Mode is Active) */}
@@ -677,8 +762,14 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
                       <p className="text-[9px] text-orange-400 uppercase font-black tracking-widest mt-0.5">{item.stage}</p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex items-center gap-2">
                     <span className="text-xs font-black font-mono text-orange-400">{item.progress}%</span>
+                    <button
+                      onClick={handleCancelGeneration}
+                      className="text-[9px] font-black uppercase tracking-wider text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-md px-2 py-1 transition-colors"
+                    >
+                      ✕ Cancel
+                    </button>
                   </div>
                 </div>
                 <div className="h-1 bg-[#131316] rounded-full overflow-hidden mt-3 border border-white/5 relative z-10">

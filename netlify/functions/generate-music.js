@@ -14,9 +14,18 @@
 //                "output": "<mp3-url>" (when succeeded),
 //                "error": "<message>" (when failed) }
 //
+//     { "action": "cancel", "id": "<prediction-id>" }
+//       -> 200 { "status": "canceled" } (best-effort; safe to call even if
+//                the prediction already finished)
+//
 // The frontend polls `status` every few seconds. This function never polls
 // itself — each call is a single fast Replicate request, well under the
 // serverless time limit.
+//
+// Generation notes:
+// - `normalization: true` turns on MusicGen's loudness normalization.
+// - `duration` is clamped to 5–120s (the model's documented range);
+//   Replicate errors surface verbatim if a duration is rejected.
 
 const REPLICATE_API = 'https://api.replicate.com/v1/predictions';
 // Pinned meta/musicgen model version (verified working 2026-10-08).
@@ -98,10 +107,11 @@ export const handler = async (event) => {
         body: JSON.stringify({
           version: MUSICGEN_VERSION,
           input: {
-            prompt,
+            prompt: prompt.slice(0, 1000),
             duration,
             output_format: 'mp3',
             model_version: 'stereo-melody-large',
+            normalization: true,
           },
         }),
       });
@@ -144,6 +154,27 @@ export const handler = async (event) => {
       }
       // "starting" | "processing" — still working
       return json(200, { status });
+    }
+
+    // ---------------------------------------------------------------
+    // action: "cancel" — stop a running prediction (best-effort)
+    // ---------------------------------------------------------------
+    if (body.action === 'cancel') {
+      const id = typeof body.id === 'string' ? body.id.trim() : '';
+      if (!id) {
+        return json(400, { error: 'Bad request: "id" is required.' });
+      }
+
+      const { res, data } = await replicateFetch(`/${encodeURIComponent(id)}/cancel`, token, {
+        method: 'POST',
+      });
+
+      if (res.status !== 200) {
+        return json(res.status, {
+          error: data?.detail || data?.error || `Replicate cancel failed (${res.status}).`,
+        });
+      }
+      return json(200, { status: data.status || 'canceled' });
     }
 
     return json(400, { error: 'Bad request: unknown action. Use "create" or "status".' });

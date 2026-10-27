@@ -30,7 +30,17 @@ git push origin HEAD:main
    so the function picks it up.
 
 That's it. Open the Song Creator, describe a song, hit **Create ♪** — the
-track composes on Replicate (~1–2 min) and auto-plays in the player when done.
+track composes on Replicate (~1–2 min for 30s) and auto-plays in the player when done.
+
+## Generation options
+
+- **Track length:** the Song Creator's Track Length pills set the MusicGen
+  duration (15 / 30 / 60 / 120 seconds). Longer tracks take proportionally
+  longer to compose, and the wait timer scales with the length.
+- **Cancel:** the ✕ Cancel button on a live queue item stops the wait and
+  asks Replicate to cancel the prediction (best-effort).
+- **Audio quality:** the function requests MusicGen's `stereo-melody-large`
+  model with loudness normalization on, MP3 output.
 
 ## Local testing (optional)
 
