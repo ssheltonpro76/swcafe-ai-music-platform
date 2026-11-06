@@ -19,6 +19,7 @@ import RemasterView from './components/RemasterView';
 import CoversView from './components/CoversView';
 import LyricsChujaiView from './components/LyricsChujaiView';
 import SongLibraryView from './components/SongLibraryView';
+import UnifiedBrowserView from './components/UnifiedBrowserView';
 import SongListView from './components/SongListView';
 import SwCafeScenesView from './components/SwCafeScenesView';
 import ReplaceSectionView from './components/ReplaceSectionView';
@@ -136,6 +137,7 @@ const App: React.FC = () => {
           </div>
         </div>
       );
+      case 'browser': return <UnifiedBrowserView onPlay={handlePlay} onNavigate={setActiveTab} />;
       case 'library': return (
         <SongLibraryView 
           onReplaceSection={(song) => {

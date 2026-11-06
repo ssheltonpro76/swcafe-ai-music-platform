@@ -15,6 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onOpenVoice 
     { id: 'lyrics-studio', label: 'Lyric Studio', icon: '✍️', badge: 'AI' },
     { id: 'studio', label: 'Studio', icon: '🎹' },
     { id: 'library', label: 'Library', icon: '📁' },
+    { id: 'browser', label: 'Sound Browser', icon: '🗂️', badge: 'New' },
     { id: 'hooks', label: 'Hooks', icon: '🪝' },
     { id: 'notifications', label: 'Notifications', icon: '🔔' },
   ];

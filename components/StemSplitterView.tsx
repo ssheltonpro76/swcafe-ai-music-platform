@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { generateMusicAdvice } from '../geminiService';
+import { saveStemPlan } from './unifiedBrowser';
 
 /**
  * SwCafe Stem Separation — three-mode UI, honestly disabled.
@@ -131,7 +132,13 @@ const StemSplitterView: React.FC = () => {
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) setSourceFile({ name: f.name, size: f.size });
+                if (f) {
+                  setSourceFile({ name: f.name, size: f.size });
+                  // Save the stem plan as a record in the Sound Browser
+                  // (10.1): plan only — no audio is extracted, no engine
+                  // is connected.
+                  saveStemPlan(f.name, f.size, mode, splitTarget, advancedSelected);
+                }
               }}
             />
           </label>
@@ -142,6 +149,7 @@ const StemSplitterView: React.FC = () => {
         <p className="text-[11px] text-zinc-400 px-2">
           Source ready: <span className="text-white font-bold">{sourceFile.name}</span> ({(sourceFile.size / 1024 / 1024).toFixed(1)} MB).
           The file stays in this browser — no audio is sent anywhere until a separation engine is connected.
+          This stem plan is saved as a record in the Sound Browser.
         </p>
       )}
 

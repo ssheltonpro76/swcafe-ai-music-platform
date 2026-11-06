@@ -4,6 +4,7 @@ import { suggestLyricsChujai, generateMusicAdvice } from '../geminiService';
 import { autoSaveSongToLibrary, getSavedSongsWithRecalled, SavedSong } from '../songs';
 import PianoRoll from './PianoRoll';
 import { MidiNote, parseMidiFile, exportMidiFile, playSynthNote, midiName } from './midi';
+import { registerUploadedSound } from './unifiedBrowser';
 import {
   PluginInstance, PluginType, PLUGIN_DEFS, PLUGIN_ORDER,
   createPluginInstance, createEffectChain, fxKey, matchPluginsFromPrompt,
@@ -646,6 +647,9 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
     setLanes(prev => [...prev, lane]);
     setSelectedLaneId(lane.id);
     void computePeaks(lane.id, url);
+    // Auto-tag (10.2): register the upload in the Sound Browser — analyzed
+    // on-device, fire-and-forget, never blocks the lane.
+    void registerUploadedSound(file, url, false);
     showToast(`Lane added: ${lane.name}. Press play to hear it with the mix.`);
   };
 

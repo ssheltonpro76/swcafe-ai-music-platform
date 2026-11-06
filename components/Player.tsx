@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { registerUploadedSound } from './unifiedBrowser';
 
 interface PlayerProps {
   track: {
@@ -156,6 +157,9 @@ const Player: React.FC<PlayerProps> = ({ track, onPlay }) => {
     if (!file || !onPlay) return;
     const url = URL.createObjectURL(file);
     const title = file.name.replace(/\.[^.]+$/, '') || 'Untitled upload';
+    // Auto-tag (10.2): register the upload in the Sound Browser — analyzed
+    // on-device, fire-and-forget, never blocks playback.
+    void registerUploadedSound(file, url, false);
     onPlay(title, 'My Upload', track.cover, url);
   };
 
