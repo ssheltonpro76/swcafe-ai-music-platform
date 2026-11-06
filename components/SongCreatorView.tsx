@@ -36,6 +36,17 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
   const [duration, setDuration] = useState(30);
   const DURATION_OPTIONS = [15, 30, 60, 120];
 
+  // --- Sounds mode: one-shot samples and loops from scratch ---
+  const [createMode, setCreateMode] = useState<'song' | 'sounds'>('song');
+  const [soundKind, setSoundKind] = useState<'one-shot' | 'loop'>('one-shot');
+  const [soundPrompt, setSoundPrompt] = useState('');
+  const [soundKey, setSoundKey] = useState('C');
+  const [soundScale, setSoundScale] = useState<'major' | 'minor'>('minor');
+  const [soundBpm, setSoundBpm] = useState(120);
+  const [soundDuration, setSoundDuration] = useState(15);
+  const [isGeneratingSound, setIsGeneratingSound] = useState(false);
+  const SOUND_KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
   // Cancellation for the in-flight generation. Refs so the queue's Cancel
   // button can signal the polling loop without re-rendering it.
   const cancelRequestedRef = useRef(false);
@@ -330,6 +341,157 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
     }
   };
 
+  // --- Sounds: generate a one-shot sample or a loop via the same
+  // MusicGen backend as songs, with short durations. Loops carry their
+  // BPM as metadata so Studio can time them to the project tempo.
+  // Honest limit (labeled in the UI): MusicGen does not cut on a clean
+  // loop point, so a loop may click on repeat — trim in Studio if needed.
+  const handleGenerateSound = async () => {
+    if (!soundPrompt.trim()) {
+      setAutoSaveToast('Describe the sound you want first — e.g. "glass smash" or "moody guitar riff".');
+      setTimeout(() => setAutoSaveToast(null), 5000);
+      return;
+    }
+    const isLoop = soundKind === 'loop';
+    const finalDuration = isLoop ? soundDuration : 5; // one-shots are 5s (MusicGen minimum)
+    const soundTitle = soundPrompt.trim().slice(0, 60);
+    const musicPrompt = isLoop
+      ? `Seamless ${soundKey} ${soundScale} loop at ${soundBpm} BPM: ${soundPrompt.trim()}. A clean repeating musical loop.`
+      : `One-shot sound effect: ${soundPrompt.trim()}. A single isolated sound, no music bed, no talking.`;
+    const ENGINE_URL = '/.netlify/functions/generate-music';
+
+    setIsGeneratingSound(true);
+    cancelRequestedRef.current = false;
+    activePredictionIdRef.current = null;
+    const itemId = Math.random().toString();
+    const coverId = Math.floor(Math.random() * 1000);
+    setActiveQueueItems([
+      { id: itemId, title: soundTitle, progress: 4, stage: isLoop ? 'Composing your loop…' : 'Creating your one-shot…', genre: `Sound · ${soundKind}`, coverId }
+    ]);
+    const setQueueStage = (progress: number, stage: string) => {
+      setActiveQueueItems(prev => prev.map(item => (item.id === itemId ? { ...item, progress, stage } : item)));
+    };
+    const failSound = (message: string) => {
+      setActiveQueueItems([]);
+      setIsGeneratingSound(false);
+      setAutoSaveToast(`⚠️ ${message}`);
+      setTimeout(() => setAutoSaveToast(null), 7000);
+    };
+
+    try {
+      setQueueStage(10, 'Sending to AI engine…');
+      let createRes: Response;
+      try {
+        createRes = await fetch(ENGINE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'create', prompt: musicPrompt.slice(0, 900), duration: finalDuration }),
+        });
+      } catch {
+        failSound('AI engine not connected — deploy to Netlify first (see DEPLOY.md)');
+        return;
+      }
+      if (createRes.status === 404) {
+        failSound('AI engine not connected — deploy to Netlify first (see DEPLOY.md)');
+        return;
+      }
+      const created = await createRes.json().catch(() => null);
+      if (!createRes.ok || !created?.id) {
+        failSound(created?.error || `AI engine error (${createRes.status}). Check REPLICATE_API_TOKEN in Netlify.`);
+        return;
+      }
+      activePredictionIdRef.current = created.id;
+      if (cancelRequestedRef.current) {
+        setActiveQueueItems([]);
+        setIsGeneratingSound(false);
+        return;
+      }
+      setQueueStage(22, isLoop ? 'Composing your loop… (~1–2 min)' : 'Creating your one-shot… (~1 min)');
+      const deadline = Date.now() + 5 * 60 * 1000;
+      let pollCount = 0;
+      let consecutivePollErrors = 0;
+      let audioUrl: string | null = null;
+      while (Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        if (cancelRequestedRef.current) {
+          setActiveQueueItems([]);
+          setIsGeneratingSound(false);
+          setAutoSaveToast('Generation cancelled.');
+          setTimeout(() => setAutoSaveToast(null), 5000);
+          return;
+        }
+        pollCount += 1;
+        setQueueStage(Math.min(24 + pollCount * 2, 92), isLoop ? 'Composing your loop…' : 'Creating your one-shot…');
+        let statusRes: Response;
+        try {
+          statusRes = await fetch(ENGINE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'status', id: created.id }),
+          });
+        } catch {
+          consecutivePollErrors += 1;
+          if (consecutivePollErrors >= 3) {
+            failSound('Lost connection to the AI engine. Please try again.');
+            return;
+          }
+          continue;
+        }
+        const statusData = await statusRes.json().catch(() => null);
+        if (!statusRes.ok) {
+          consecutivePollErrors += 1;
+          if (consecutivePollErrors >= 3) {
+            failSound(statusData?.error || `AI engine error (${statusRes.status}).`);
+            return;
+          }
+          continue;
+        }
+        consecutivePollErrors = 0;
+        const st = statusData?.status;
+        if (st === 'succeeded') {
+          const out = statusData?.output;
+          audioUrl = Array.isArray(out) ? out[0] : out;
+          if (!audioUrl) {
+            failSound('The AI engine finished but returned no audio. Please try again.');
+            return;
+          }
+          break;
+        }
+        if (st === 'failed' || st === 'canceled') {
+          failSound(statusData?.error || 'The AI engine could not finish this sound. Try a different description.');
+          return;
+        }
+      }
+      if (!audioUrl) {
+        failSound('Generation timed out after 5 minutes. Please try again.');
+        return;
+      }
+      setQueueStage(100, 'Finalizing…');
+      const track = autoSaveSongToLibrary({
+        title: soundTitle,
+        genre: `Sound · ${soundKind}`,
+        lyrics: `[Sound]\n${soundPrompt.trim()}`,
+        theme: soundPrompt.trim(),
+        engine: 'MusicGen · Sounds',
+        coverId,
+        audioUrl,
+        ...(isLoop ? { bpm: soundBpm } : {}),
+      });
+      setLocalLibrary(prev => [track, ...prev.filter(x => x.id !== track.id)]);
+      setSelectedTrackId(track.id);
+      setActiveQueueItems([]);
+      setIsGeneratingSound(false);
+      setAutoSaveToast(`💾 Sound saved: "${soundTitle}" vaulted to Library!${isLoop ? ` (${soundBpm} BPM — Studio can time it to your project tempo.)` : ''}`);
+      setTimeout(() => setAutoSaveToast(null), 5500);
+      if (onPlay) {
+        onPlay(track.title, 'MusicGen · Sounds', `https://picsum.photos/seed/${track.coverId}/200/200`, audioUrl);
+      }
+    } catch (e) {
+      console.error('Sounds generation error:', e);
+      failSound('Something went wrong while generating. Please try again.');
+    }
+  };
+
   // Quick tag insertion
   const handleInsertTag = (tag: string) => {
     setLyrics(prev => {
@@ -459,8 +621,26 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
         {/* ========================================================= */}
         <div className="lg:col-span-3 border-r border-white/5 bg-[#131316] flex flex-col min-h-0">
           
+          {/* Create mode: full songs, or one-shot samples & loops (Sounds) */}
+          <div className="p-4 pb-0 flex gap-2">
+            {(['song', 'sounds'] as const).map(m => (
+              <button
+                key={m}
+                onClick={() => setCreateMode(m)}
+                className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                  createMode === m
+                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white border-orange-500 shadow-lg'
+                    : 'bg-[#1a1a1e]/50 text-zinc-400 hover:text-white border-white/5'
+                }`}
+                title={m === 'sounds' ? 'Create individual one-shot samples and loops from scratch' : 'Create a full song'}
+              >
+                {m === 'song' ? '🎵 Song' : '🔊 Sounds'}
+              </button>
+            ))}
+          </div>
+
           {/* Subtab selection headers (Simple vs Custom toggle) */}
-          <div className="p-4 border-b border-zinc-950 flex gap-2">
+          <div className={`p-4 border-b border-zinc-950 flex gap-2 ${createMode === 'sounds' ? 'hidden' : ''}`}>
             <button 
               onClick={() => setIsCustom(false)} 
               className={`flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${
@@ -483,8 +663,107 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
             </button>
           </div>
 
+          {/* Sounds panel (one-shots & loops) */}
+          {createMode === 'sounds' && (
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 text-left animate-in fade-in duration-300">
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Make individual one-shot samples and loops from scratch — a sound for your track, or a loop to start an idea and drop into Studio.
+              </p>
+              <div className="flex gap-2">
+                {(['one-shot', 'loop'] as const).map(kind => (
+                  <button
+                    key={kind}
+                    onClick={() => setSoundKind(kind)}
+                    className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      soundKind === kind
+                        ? 'bg-white/10 text-orange-400 border-orange-500/25'
+                        : 'bg-[#1a1a1e]/50 text-zinc-400 hover:text-white border-white/5'
+                    }`}
+                  >
+                    {kind === 'one-shot' ? '⚡ One-Shot' : '🔁 Loop'}
+                  </button>
+                ))}
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">
+                  {soundKind === 'one-shot' ? 'What sound do you hear in your head?' : 'Describe the loop'}
+                </label>
+                <textarea
+                  value={soundPrompt}
+                  onChange={(e) => setSoundPrompt(e.target.value)}
+                  placeholder={soundKind === 'one-shot' ? 'e.g. airhorn blast, glass smash, footsteps on gravel for a foley scene…' : 'e.g. moody guitar riff, deep bassline, bright synth lick…'}
+                  className="w-full h-24 bg-[#1a1a1e]/50 border border-white/5 hover:border-white/10 rounded-xl p-3 font-sans text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/40 transition-all custom-scrollbar resize-none font-bold"
+                />
+              </div>
+              {soundKind === 'loop' && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">Key</label>
+                      <div className="flex gap-1">
+                        <select
+                          value={soundKey}
+                          onChange={(e) => setSoundKey(e.target.value)}
+                          className="flex-1 bg-[#1a1a1e] border border-white/10 rounded-xl px-2 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500/50"
+                        >
+                          {SOUND_KEYS.map(k => <option key={k} value={k}>{k}</option>)}
+                        </select>
+                        <select
+                          value={soundScale}
+                          onChange={(e) => setSoundScale(e.target.value as 'major' | 'minor')}
+                          className="flex-1 bg-[#1a1a1e] border border-white/10 rounded-xl px-2 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500/50"
+                        >
+                          <option value="major">Major</option>
+                          <option value="minor">Minor</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">Tempo (BPM)</label>
+                      <input
+                        type="number"
+                        min={40}
+                        max={220}
+                        value={soundBpm}
+                        onChange={(e) => setSoundBpm(Math.max(40, Math.min(220, parseInt(e.target.value) || 120)))}
+                        className="w-full bg-[#1a1a1e] border border-white/10 rounded-xl px-3 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500/50"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">Loop Length</label>
+                    <div className="flex gap-1.5">
+                      {[15, 30].map(sec => (
+                        <button
+                          key={sec}
+                          onClick={() => setSoundDuration(sec)}
+                          disabled={isGeneratingSound}
+                          className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all disabled:opacity-50 ${
+                            soundDuration === sec
+                              ? 'bg-white/10 text-orange-400 border-orange-500/25'
+                              : 'bg-[#1a1a1e] text-zinc-400 hover:text-white border-white/5'
+                          }`}
+                        >
+                          {sec}s
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 leading-relaxed">
+                    Loops save with their BPM, so Studio can time them to your project tempo. Honest limit: the engine does not cut on a clean loop point yet, so a loop may click on repeat — trim the start/end in Studio if needed.
+                  </p>
+                </>
+              )}
+              {soundKind === 'one-shot' && (
+                <p className="text-[10px] text-zinc-500 leading-relaxed">
+                  One-shots are 5 seconds — the shortest the engine makes. Download the audio from your library, or send it to Studio as a lane.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Workbench scrollable options */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 text-left">
+          <div className={`flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 text-left ${createMode === 'sounds' ? 'hidden' : ''}`}>
             
             {/* Auto-Save Persistence Status Indicator */}
             <div className="px-3 py-2 bg-orange-950/25 border border-orange-500/20 rounded-xl flex items-center justify-between text-left">
@@ -634,48 +913,84 @@ const SongCreatorView: React.FC<SongCreatorViewProps> = ({ initialData, onPlay, 
 
           {/* Workbench Title input & Create trigger footer */}
           <div className="p-4 bg-[#131316]/50 border-t border-white/5 space-y-3">
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest text-left block">Title</label>
-              <input 
-                type="text" 
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Hurts Like Hell"
-                className="w-full bg-[#1a1a1e] border border-white/5 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
-              />
-            </div>
+            {createMode === 'song' ? (
+              <>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest text-left block">Title</label>
+                  <input 
+                    type="text" 
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Hurts Like Hell"
+                    className="w-full bg-[#1a1a1e] border border-white/5 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-orange-500"
+                  />
+                </div>
 
-            <div className="flex gap-2 items-center">
-              <button 
-                onClick={() => {
-                  setTitle('');
-                  setLyrics('');
-                  setTheme('');
-                }}
-                className="p-3 rounded-xl bg-[#1a1a1e] hover:bg-white/10 text-zinc-400 hover:text-white transition-colors border border-white/5"
-                title="Reset active form"
-              >
-                🗑️
-              </button>
-              
-              <button 
-                onClick={handleGenerate}
-                disabled={isProcessing}
-                className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-500 text-white font-black py-3 rounded-xl shadow-lg shadow-black/40 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
-              >
-                {isProcessing ? (
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-3 w-3 rounded-full border-2 border-white/20 border-t-white animate-spin"></span>
-                    Synthesizing...
-                  </span>
-                ) : (
-                  <>
-                    <span>Create ♪</span>
-                    <span className="text-[10px] text-white/70 font-black">10 🪙</span>
-                  </>
-                )}
-              </button>
-            </div>
+                <div className="flex gap-2 items-center">
+                  <button 
+                    onClick={() => {
+                      setTitle('');
+                      setLyrics('');
+                      setTheme('');
+                    }}
+                    className="p-3 rounded-xl bg-[#1a1a1e] hover:bg-white/10 text-zinc-400 hover:text-white transition-colors border border-white/5"
+                    title="Reset active form"
+                  >
+                    🗑️
+                  </button>
+                  
+                  <button 
+                    onClick={handleGenerate}
+                    disabled={isProcessing}
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-500 text-white font-black py-3 rounded-xl shadow-lg shadow-black/40 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-3 w-3 rounded-full border-2 border-white/20 border-t-white animate-spin"></span>
+                        Synthesizing...
+                      </span>
+                    ) : (
+                      <>
+                        <span>Create ♪</span>
+                        <span className="text-[10px] text-white/70 font-black">10 🪙</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex gap-2 items-center">
+                  <button 
+                    onClick={() => setSoundPrompt('')}
+                    className="p-3 rounded-xl bg-[#1a1a1e] hover:bg-white/10 text-zinc-400 hover:text-white transition-colors border border-white/5"
+                    title="Clear sound description"
+                  >
+                    🗑️
+                  </button>
+                  <button 
+                    onClick={() => void handleGenerateSound()}
+                    disabled={isGeneratingSound || isProcessing}
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-500 text-white font-black py-3 rounded-xl shadow-lg shadow-black/40 active:scale-95 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {isGeneratingSound ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-3 w-3 rounded-full border-2 border-white/20 border-t-white animate-spin"></span>
+                        {soundKind === 'loop' ? 'Composing loop…' : 'Creating sound…'}
+                      </span>
+                    ) : (
+                      <>
+                        <span>{soundKind === 'loop' ? 'Create Loop ♪' : 'Create Sound ⚡'}</span>
+                        <span className="text-[10px] text-white/70 font-black">{soundKind === 'loop' ? `${soundBpm} BPM` : '5s'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <p className="text-[9px] text-zinc-600 font-semibold text-center">
+                  {soundKind === 'loop' ? `Loop in ${soundKey} ${soundScale} at ${soundBpm} BPM — saved with its BPM for Studio.` : 'One-shot sample — 5 seconds, saved to your library.'}
+                </p>
+              </>
+            )}
           </div>
 
         </div>

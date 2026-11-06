@@ -4,6 +4,10 @@ import { suggestLyricsChujai, generateMusicAdvice } from '../geminiService';
 import { autoSaveSongToLibrary, getSavedSongsWithRecalled, SavedSong } from '../songs';
 import PianoRoll from './PianoRoll';
 import { MidiNote, parseMidiFile, exportMidiFile, playSynthNote, midiName } from './midi';
+import {
+  PluginInstance, PluginType, PLUGIN_DEFS, PLUGIN_ORDER,
+  createPluginInstance, createEffectChain, fxKey, matchPluginsFromPrompt,
+} from './studioEffects';
 
 /**
  * SwCafe Studio — hybrid workstation.
@@ -50,6 +54,8 @@ interface Lane {
   fadeCurve: FadeCurve;
   /** Hidden lanes keep playing in the mix; only their display is hidden. */
   hidden: boolean;
+  /** Per-lane effect plugins (insert chain after pan, before the master bus). */
+  effects: PluginInstance[];
 }
 
 /** A MIDI lane: notes played through a simple synth preview voice. */
@@ -63,10 +69,12 @@ interface MidiLane {
   muted: boolean;
   solo: boolean;
   hidden: boolean;
+  /** Per-lane effect plugins (same insert chain as audio lanes). */
+  effects: PluginInstance[];
 }
 
-const defaultClipProps = (): Pick<Lane, 'pitch' | 'stretch' | 'loop' | 'reverse' | 'fadeIn' | 'fadeOut' | 'fadeCurve' | 'hidden'> => ({
-  pitch: 0, stretch: 1, loop: false, reverse: false, fadeIn: 0, fadeOut: 0, fadeCurve: 'linear', hidden: false,
+const defaultClipProps = (): Pick<Lane, 'pitch' | 'stretch' | 'loop' | 'reverse' | 'fadeIn' | 'fadeOut' | 'fadeCurve' | 'hidden' | 'effects'> => ({
+  pitch: 0, stretch: 1, loop: false, reverse: false, fadeIn: 0, fadeOut: 0, fadeCurve: 'linear', hidden: false, effects: [],
 });
 
 interface Section {
@@ -77,11 +85,21 @@ interface Section {
   text: string;
 }
 
+/** Live effect chain for a lane (built from its plugins, rebuilt on change). */
+interface FxChain {
+  input: AudioNode;
+  output: AudioNode;
+  nodes: AudioNode[];
+  key: string;
+  stop: () => void;
+}
+
 interface LaneNodes {
   el: HTMLAudioElement;
   src: MediaElementAudioSourceNode;
   gain: GainNode;
   pan: StereoPannerNode;
+  fx?: FxChain;
 }
 
 const ENGINE_URL = '/.netlify/functions/generate-music';
@@ -232,6 +250,10 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
   const [pitchText, setPitchText] = useState('0.00');
   const [laneDurations, setLaneDurations] = useState<Record<string, number>>({});
 
+  // --- Effects rack / plugin builder ---
+  const [pluginPrompt, setPluginPrompt] = useState('');
+  const [pluginPromptNote, setPluginPromptNote] = useState<string | null>(null);
+
   // --- MIDI lanes / piano roll ---
   const [midiLanes, setMidiLanes] = useState<MidiLane[]>([]);
   const [selectedMidiLaneId, setSelectedMidiLaneId] = useState<string | null>(null);
@@ -266,7 +288,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
   const triggeredNotesRef = useRef<Set<string>>(new Set());
   const rafRef = useRef<number | null>(null);
   const midiVoicesRef = useRef<Map<string, () => void>>(new Map());
-  const midiNodesRef = useRef<Map<string, { gain: GainNode; pan: StereoPannerNode }>>(new Map());
+  const midiNodesRef = useRef<Map<string, { gain: GainNode; pan: StereoPannerNode; fx?: FxChain }>>(new Map());
   const midiLanesRef = useRef<MidiLane[]>([]);
   const typingVoicesRef = useRef<Map<string, Array<() => void>>>(new Map());
   const arpHeldRef = useRef<Map<string, number>>(new Map());
@@ -281,6 +303,41 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   useEffect(() => { speedRef.current = speed; }, [speed]);
   useEffect(() => { loopRef.current = { on: loopOn, start: loopStart, end: loopEnd }; }, [loopOn, loopStart, loopEnd]);
+
+  // Rebuild a lane's effect chain whenever its plugin list changes.
+  // The chain sits between the lane's pan node and the master bus, so
+  // plugins hear the lane's level/pan and feed the master.
+  useEffect(() => {
+    const ctx = ctxRef.current;
+    const master = masterGainRef.current;
+    if (!ctx || !master) return;
+    const rebuild = (
+      pan: StereoPannerNode,
+      current: FxChain | undefined,
+      effects: PluginInstance[],
+      setFx: (fx: FxChain) => void
+    ) => {
+      const key = fxKey(effects);
+      if (current?.key === key) return;
+      if (current) {
+        try { pan.disconnect(); } catch { /* noop */ }
+        current.nodes.forEach(n => { try { n.disconnect(); } catch { /* noop */ } });
+        current.stop();
+      }
+      const built = createEffectChain(ctx, effects);
+      pan.connect(built.input);
+      built.output.connect(master);
+      setFx({ ...built, key });
+    };
+    lanesRef.current.forEach(lane => {
+      const nodes = nodesRef.current.get(lane.id);
+      if (nodes) rebuild(nodes.pan, nodes.fx, lane.effects, fx => { nodes.fx = fx; });
+    });
+    midiLanesRef.current.forEach(lane => {
+      const nodes = midiNodesRef.current.get(lane.id);
+      if (nodes) rebuild(nodes.pan, nodes.fx, lane.effects, fx => { nodes.fx = fx; });
+    });
+  }, [lanes, midiLanes]);
   // Keep the pitch text field in sync with the selected clip.
   const selectedLaneForPitch = lanes.find(l => l.id === selectedLaneId) || null;
   useEffect(() => {
@@ -373,10 +430,18 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
     nodesRef.current.forEach(n => {
       try { n.el.pause(); } catch { /* noop */ }
       try { n.src.disconnect(); n.gain.disconnect(); n.pan.disconnect(); } catch { /* noop */ }
+      if (n.fx) {
+        n.fx.nodes.forEach(x => { try { x.disconnect(); } catch { /* noop */ } });
+        n.fx.stop();
+      }
     });
     nodesRef.current.clear();
     midiNodesRef.current.forEach(n => {
       try { n.gain.disconnect(); n.pan.disconnect(); } catch { /* noop */ }
+      if (n.fx) {
+        n.fx.nodes.forEach(x => { try { x.disconnect(); } catch { /* noop */ } });
+        n.fx.stop();
+      }
     });
     midiNodesRef.current.clear();
     if (ctxRef.current) {
@@ -418,8 +483,11 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
     const src = ctx.createMediaElementSource(el);
     const gain = ctx.createGain();
     const pan = ctx.createStereoPanner();
-    src.connect(gain); gain.connect(pan); pan.connect(masterGainRef.current);
-    const nodes: LaneNodes = { el, src, gain, pan };
+    // Insert chain: source -> gain -> pan -> [effects] -> master bus.
+    const built = createEffectChain(ctx, lane.effects);
+    src.connect(gain); gain.connect(pan);
+    pan.connect(built.input); built.output.connect(masterGainRef.current);
+    const nodes: LaneNodes = { el, src, gain, pan, fx: { ...built, key: fxKey(lane.effects) } };
     nodesRef.current.set(lane.id, nodes);
     el.addEventListener('ended', () => {
       // Per-clip loop: restart this clip while the transport is playing.
@@ -463,15 +531,18 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
   };
 
   /** MIDI lane gain/pan nodes in the live graph (created lazily). */
-  const ensureMidiNodes = (lane: MidiLane): { gain: GainNode; pan: StereoPannerNode } | null => {
+  const ensureMidiNodes = (lane: MidiLane): { gain: GainNode; pan: StereoPannerNode; fx?: FxChain } | null => {
     const existing = midiNodesRef.current.get(lane.id);
     if (existing) return existing;
     const ctx = ensureGraph();
     if (!ctx || !masterGainRef.current) return null;
     const gain = ctx.createGain();
     const pan = ctx.createStereoPanner();
-    gain.connect(pan); pan.connect(masterGainRef.current);
-    const nodes = { gain, pan };
+    // Insert chain: synth voice -> gain -> pan -> [effects] -> master bus.
+    const built = createEffectChain(ctx, lane.effects);
+    gain.connect(pan);
+    pan.connect(built.input); built.output.connect(masterGainRef.current);
+    const nodes = { gain, pan, fx: { ...built, key: fxKey(lane.effects) } };
     midiNodesRef.current.set(lane.id, nodes);
     return nodes;
   };
@@ -582,6 +653,10 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
     const nodes = nodesRef.current.get(id);
     if (nodes) {
       try { nodes.el.pause(); nodes.src.disconnect(); nodes.gain.disconnect(); nodes.pan.disconnect(); } catch { /* noop */ }
+      if (nodes.fx) {
+        nodes.fx.nodes.forEach(x => { try { x.disconnect(); } catch { /* noop */ } });
+        nodes.fx.stop();
+      }
       nodesRef.current.delete(id);
     }
     setLanes(prev => prev.filter(l => l.id !== id));
@@ -607,6 +682,10 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
     const nodes = midiNodesRef.current.get(id);
     if (nodes) {
       try { nodes.gain.disconnect(); nodes.pan.disconnect(); } catch { /* noop */ }
+      if (nodes.fx) {
+        nodes.fx.nodes.forEach(x => { try { x.disconnect(); } catch { /* noop */ } });
+        nodes.fx.stop();
+      }
       midiNodesRef.current.delete(id);
     }
     setMidiLanes(prev => prev.filter(l => l.id !== id));
@@ -851,7 +930,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
       const lane: MidiLane = {
         id: `midi-${Date.now()}`,
         name: file.name.replace(/\.(mid|midi)$/i, '') || 'MIDI',
-        color, notes, volume: 85, pan: 0, muted: false, solo: false, hidden: false,
+        color, notes, volume: 85, pan: 0, muted: false, solo: false, hidden: false, effects: [],
       };
       setMidiLanes(prev => [...prev, lane]);
       setSelectedMidiLaneId(lane.id);
@@ -1144,7 +1223,10 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
             gain.gain.linearRampToValueAtTime(0.0001, clipDur);
           }
         }
-        src.connect(gain); gain.connect(pan); pan.connect(off.destination);
+        // Lane effects are rendered in the bounce too (same chain as live).
+        const fx = createEffectChain(off, lane.effects);
+        src.connect(gain); gain.connect(pan);
+        pan.connect(fx.input); fx.output.connect(off.destination);
         src.start(0);
       });
       midiLanesRef.current.forEach(lane => {
@@ -1154,7 +1236,9 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
         const pan = off.createStereoPanner();
         gain.gain.value = (lane.volume / 100) * (masterVolume / 100);
         pan.pan.value = lane.pan / 100;
-        gain.connect(pan); pan.connect(off.destination);
+        const fx = createEffectChain(off, lane.effects);
+        gain.connect(pan);
+        pan.connect(fx.input); fx.output.connect(off.destination);
         lane.notes.forEach(note => {
           playSynthNote(off, gain, { midi: note.pitch, velocity: note.velocity, when: note.start, duration: Math.max(0.05, note.end - note.start) });
         });
@@ -1176,6 +1260,85 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
   };
 
   const selectedLane = lanes.find(l => l.id === selectedLaneId) || null;
+
+  // --- Effects rack: per-lane plugins (audio + MIDI lanes) ---
+  const fxTarget = selectedLane
+    ? { kind: 'audio' as const, id: selectedLane.id, name: selectedLane.name, effects: selectedLane.effects }
+    : (() => {
+        const m = midiLanes.find(l => l.id === selectedMidiLaneId);
+        return m ? { kind: 'midi' as const, id: m.id, name: m.name, effects: m.effects } : null;
+      })();
+
+  const setFxForTarget = (effects: PluginInstance[]) => {
+    if (!fxTarget) return;
+    if (fxTarget.kind === 'audio') updateLane(fxTarget.id, { effects });
+    else updateMidiLane(fxTarget.id, { effects });
+  };
+
+  const addPlugin = (type: PluginType, preset?: Record<string, number>) => {
+    if (!fxTarget) { showToast('Select a lane first, then add an effect.'); return; }
+    const existing = fxTarget.effects.find(p => p.type === type);
+    if (existing) {
+      // One slot per effect type: re-apply the preset and enable it.
+      setFxForTarget(fxTarget.effects.map(p => (p.type === type ? { ...p, enabled: true, params: { ...p.params, ...(preset || {}) } } : p)));
+      showToast(`${PLUGIN_DEFS[type].label} is already on this lane — preset re-applied and enabled.`);
+      return;
+    }
+    setFxForTarget([...fxTarget.effects, createPluginInstance(type, preset)]);
+    showToast(`${PLUGIN_DEFS[type].label} added to ${fxTarget.name}.`);
+  };
+
+  const updatePluginParam = (pluginId: string, key: string, value: number) => {
+    if (!fxTarget) return;
+    setFxForTarget(fxTarget.effects.map(p => (p.id === pluginId ? { ...p, params: { ...p.params, [key]: value } } : p)));
+  };
+
+  const togglePlugin = (pluginId: string) => {
+    if (!fxTarget) return;
+    setFxForTarget(fxTarget.effects.map(p => (p.id === pluginId ? { ...p, enabled: !p.enabled } : p)));
+  };
+
+  const removePlugin = (pluginId: string) => {
+    if (!fxTarget) return;
+    setFxForTarget(fxTarget.effects.filter(p => p.id !== pluginId));
+  };
+
+  /** Plugin Builder: match the prompt to presets from the built-in library.
+   *  Honest by design — this is preset-matching, not generated DSP. */
+  const handlePluginPrompt = () => {
+    const text = pluginPrompt.trim();
+    if (!text) {
+      setPluginPromptNote('Describe an effect — e.g. "warm hall reverb" or "sweeping auto-pan".');
+      return;
+    }
+    if (!fxTarget) {
+      setPluginPromptNote('Select a lane first — the built effect goes on the selected lane.');
+      return;
+    }
+    const { matches, notes } = matchPluginsFromPrompt(text);
+    if (matches.length === 0) {
+      setPluginPromptNote(
+        `No match for that — I can build chorus, auto-pan, delay, or reverb from words. Try "add a warm hall reverb".${notes.length > 0 ? ` ${notes.join(' ')}` : ''}`
+      );
+      return;
+    }
+    // Apply all matches to one fresh effects list (one state write, so a
+    // prompt matching two effects keeps both).
+    let effects = [...fxTarget.effects];
+    matches.forEach(m => {
+      const existing = effects.find(p => p.type === m.type);
+      if (existing) {
+        effects = effects.map(p => (p.type === m.type ? { ...p, enabled: true, params: { ...p.params, ...m.preset } } : p));
+      } else {
+        effects = [...effects, createPluginInstance(m.type, m.preset)];
+      }
+    });
+    setFxForTarget(effects);
+    setPluginPromptNote(
+      `Built from your words (preset match, not generated DSP): ${matches.map(m => m.why).join(' · ')}.${notes.length > 0 ? ` ${notes.join(' ')}` : ''}`
+    );
+  };
+
   const playheadPct = duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
   const loopBand = duration > 0 && loopEnd > loopStart
     ? { left: (loopStart / duration) * 100, width: ((loopEnd - loopStart) / duration) * 100 }
@@ -1917,6 +2080,93 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
                   <p className="text-[11px] text-zinc-500">Select a lane to edit its channel strip.</p>
                 )}
 
+                {/* Effects Rack — real Web Audio inserts on the selected lane */}
+                <div className="space-y-3 bg-[#1a1a1e]/70 border border-white/5 rounded-2xl p-3.5">
+                  <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">
+                    🎛️ Effects Rack{fxTarget ? ` — ${fxTarget.name}` : ''}
+                  </span>
+                  {!fxTarget ? (
+                    <p className="text-[10px] text-zinc-500 leading-relaxed">Select an audio or MIDI lane to add effects to it.</p>
+                  ) : (
+                    <>
+                      {fxTarget.effects.length === 0 ? (
+                        <p className="text-[10px] text-zinc-500 leading-relaxed">No effects on this lane yet. Add one below, or describe one in the Plugin Builder.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {fxTarget.effects.map(plugin => (
+                            <div key={plugin.id} className="bg-[#131316] border border-white/5 rounded-xl p-2.5 space-y-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={plugin.enabled}
+                                  onChange={() => togglePlugin(plugin.id)}
+                                  className="accent-[#ff5e00] cursor-pointer"
+                                  title={plugin.enabled ? 'Bypass this effect' : 'Enable this effect'}
+                                />
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white flex-1">{PLUGIN_DEFS[plugin.type].label}</span>
+                                <button onClick={() => removePlugin(plugin.id)} className="text-zinc-500 hover:text-red-400 text-xs px-1" title="Remove effect">✕</button>
+                              </div>
+                              <p className="text-[9px] text-zinc-600 leading-snug">{PLUGIN_DEFS[plugin.type].blurb}</p>
+                              {PLUGIN_DEFS[plugin.type].params.map(param => (
+                                <div key={param.key} className="space-y-0.5">
+                                  <div className="flex justify-between text-[9px] font-extrabold text-zinc-500 uppercase">
+                                    <span>{param.label}</span>
+                                    <span className="text-zinc-300 font-mono">{plugin.params[param.key]}{param.unit || ''}</span>
+                                  </div>
+                                  <input
+                                    type="range"
+                                    min={param.min}
+                                    max={param.max}
+                                    step={param.step}
+                                    value={plugin.params[param.key]}
+                                    onChange={(e) => updatePluginParam(plugin.id, param.key, parseFloat(e.target.value))}
+                                    className="w-full accent-[#ff5e00] cursor-pointer h-1"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-1.5">
+                        {PLUGIN_ORDER.map(type => (
+                          <button
+                            key={type}
+                            onClick={() => addPlugin(type)}
+                            className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 text-[9px] font-black uppercase tracking-wider text-zinc-300 transition-colors"
+                          >
+                            + {PLUGIN_DEFS[type].label}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Plugin Builder — preset-matching from words */}
+                      <div className="pt-2 border-t border-white/5 space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-wider text-zinc-500 block">Plugin Builder — describe it in words</label>
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            value={pluginPrompt}
+                            onChange={(e) => setPluginPrompt(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handlePluginPrompt(); }}
+                            placeholder='e.g. "warm hall reverb" or "sweeping auto-pan"'
+                            className="flex-1 min-w-0 bg-[#131316] border border-white/10 rounded-lg px-2.5 py-2 text-[11px] text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-orange-500/40"
+                          />
+                          <button
+                            onClick={handlePluginPrompt}
+                            className="px-3 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-600 text-white text-[9px] font-black uppercase tracking-wider transition-all whitespace-nowrap"
+                          >
+                            Build
+                          </button>
+                        </div>
+                        {pluginPromptNote && <p className="text-[9px] text-zinc-400 leading-snug">{pluginPromptNote}</p>}
+                        <p className="text-[9px] text-zinc-600 leading-snug">
+                          Preset-matching: your words are matched to the built-in library (chorus, auto-pan, delay, reverb). This does not generate new DSP code. Pitch effects are not available — no pitch engine is connected. Effects are live on the lane and included in Bounce Mix.
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 <div className="space-y-2 bg-[#1a1a1e]/70 border border-white/5 rounded-2xl p-3.5">
                   <span className="text-[10px] font-black text-[#ff711d] uppercase tracking-wider block">🎹 Copilot Signal Assist</span>
                   <button onClick={() => void handleCopilot()} disabled={isAskingCopilot || !selectedLane} className="w-full py-2 rounded-lg bg-white/10 hover:bg-white/15 text-zinc-100 border border-white/5 text-[9px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 disabled:opacity-40">
@@ -1927,7 +2177,7 @@ const StudioView: React.FC<{ onOpenVoice: () => void; onPlay?: (title: string, a
 
                 <div className="space-y-2 bg-[#1a1a1e]/70 border border-white/5 rounded-2xl p-3.5">
                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">Session notes</span>
-                  <p className="text-[10px] text-zinc-500 leading-relaxed">BPM and time signature set the bar grid only — they do not retime audio. Speed (0.5×/1×/2×) changes real playback rate. Clip pitch and timestretch are also rate-based: they move tempo and pitch together, since there is no pitch-preserving timestretch engine yet. MIDI lanes play a simple synth preview voice, not a sampled instrument.</p>
+                  <p className="text-[10px] text-zinc-500 leading-relaxed">BPM and time signature set the bar grid only — they do not retime audio. Speed (0.5×/1×/2×) changes real playback rate. Clip pitch and timestretch are also rate-based: they move tempo and pitch together, since there is no pitch-preserving timestretch engine yet. MIDI lanes play a simple synth preview voice, not a sampled instrument. Lane effects (chorus, auto-pan, delay, reverb) are real Web Audio inserts — live on the lane and included in Bounce Mix. The Plugin Builder matches your words to presets from that library; it does not generate new DSP, and pitch effects are not available.</p>
                 </div>
               </>
             )}

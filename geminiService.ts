@@ -172,6 +172,53 @@ export const suggestRhymesAndMetaphors = async (
   }
 };
 
+/**
+ * Generate lyrics in the voice of a saved "Lyricist" — examples of the
+ * user's own lyrics (name + example text) are included in the prompt so
+ * the new lyrics match the same vibe, vocabulary, and cadence. The
+ * examples stay local to the user's browser; only the prompt text is
+ * sent to Gemini, like every other lyrics call in this file.
+ */
+export const generateLyricsWithLyricist = async (
+  topic: string,
+  genre: string = 'Pop',
+  complexity: string = 'High',
+  mood?: string,
+  structure?: string,
+  lyricist?: { name: string; examples: string }
+): Promise<string> => {
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const voiceBlock = lyricist?.examples.trim()
+      ? `\nVoice reference — the songwriter's saved "Lyricist" called "${lyricist.name}". Study these example lyrics and write the new song in the SAME voice: same vocabulary, imagery, rhyme habits, and emotional register. Do not copy lines verbatim — write fresh lyrics in that voice.\n"""\n${lyricist.examples.slice(0, 4000)}\n"""\n`
+      : '';
+    const promptText = `Generate high-quality, professional song lyrics.
+Topic/Theme: "${topic}"
+Genre: ${genre}
+Mood: ${mood || 'Dynamic'}
+Complexity: ${complexity}
+Structure Desired: ${structure || '[Intro], [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Chorus], [Bridge], [Chorus], [Outro]'}
+${voiceBlock}
+Formatting Rules:
+- Mark every song section with bracketed headers like [Intro], [Verse 1], [Chorus], [Bridge], [Outro], [Drop], [Hook].
+- Include musical cues or production tags where appropriate (e.g. (vocals soft), (drum build-up), (guitar crescendo)).
+- Ensure natural rhythm, meter, rhyme, and emotional depth suitable for vocal performance.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.7-flash',
+      contents: promptText,
+      config: {
+        systemInstruction: "You are an elite, Grammy-caliber songwriter and music lyricist at SwCafe. You craft verses and choruses with profound emotional resonance, impeccable cadence, and vivid imagery — and when a voice reference is supplied, you match that voice.",
+        temperature: 0.85,
+      },
+    });
+    return response.text || generateFallbackLyrics(topic, genre);
+  } catch (error) {
+    console.error("Gemini Lyricist Error:", error);
+    return generateFallbackLyrics(topic, genre);
+  }
+};
+
 const generateFallbackLyrics = (topic: string, genre: string): string => {
   return `[Intro]
 (Atmospheric pads and gentle guitars fade in)

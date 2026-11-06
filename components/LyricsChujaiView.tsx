@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   suggestLyricsChujai, 
   continueLyricsWithAI, 
   polishLyricsWithAI, 
-  suggestRhymesAndMetaphors 
+  suggestRhymesAndMetaphors,
+  generateLyricsWithLyricist
 } from '../geminiService';
 import { autoSaveSongToLibrary } from '../songs';
 
@@ -21,6 +22,32 @@ interface SavedLyricDraft {
   theme: string;
   updatedAt: string;
 }
+
+/** A saved "Lyricist": a named voice built from the user's own lyric
+ *  examples. Stored locally; the examples are sent to Gemini as prompt
+ *  context when generating new lyrics in that voice. */
+interface Lyricist {
+  id: string;
+  name: string;
+  examples: string;
+  createdAt: string;
+}
+
+const LYRICISTS_KEY = 'swcafe_lyricists';
+const AUTOSAVE_KEY = 'swcafe_lyrics_autosave';
+
+/** Parse bracketed headers ([Verse 1], [Chorus], ...) into the song's
+ *  structure: label + character offset + line number, for the structure bar. */
+const parseLyricSections = (text: string): { label: string; start: number; line: number }[] => {
+  const out: { label: string; start: number; line: number }[] = [];
+  const re = /^\[(.+?)\]\s*$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    const start = m.index ?? 0;
+    out.push({ label: m[1].trim(), start, line: text.slice(0, start).split('\n').length });
+  }
+  return out;
+};
 
 const SECTION_TAGS = [
   '[Intro]',
@@ -101,7 +128,26 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
   // Local drafts state
   const [drafts, setDrafts] = useState<SavedLyricDraft[]>([]);
 
-  // Load saved drafts on mount
+  // Autosave state (real: debounced localStorage write + visible indicator)
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Full-screen editor mode
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Lyricists (saved voices)
+  const [lyricists, setLyricists] = useState<Lyricist[]>([]);
+  const [activeLyricistId, setActiveLyricistId] = useState<string | null>(null);
+  const [newLyricistName, setNewLyricistName] = useState('');
+
+  // Natural-language editing (free-text instruction, whole song or selection)
+  const [nlInstruction, setNlInstruction] = useState('');
+  const [nlScope, setNlScope] = useState<'all' | 'selection'>('all');
+  const [isNlEditing, setIsNlEditing] = useState(false);
+
+  // Load saved drafts + lyricists + autosave on mount
   useEffect(() => {
     const saved = localStorage.getItem('swcafe_lyrics_drafts');
     if (saved) {
@@ -111,13 +157,66 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
         console.error('Error loading lyric drafts', err);
       }
     }
+    try {
+      const savedLyricists = localStorage.getItem(LYRICISTS_KEY);
+      if (savedLyricists) setLyricists(JSON.parse(savedLyricists));
+    } catch (err) {
+      console.error('Error loading lyricists', err);
+    }
+
+    // Restore the autosaved working draft if one exists; otherwise the
+    // default sample below. Autosave is the live working copy, not a draft.
+    let restored = false;
+    try {
+      const auto = localStorage.getItem(AUTOSAVE_KEY);
+      if (auto) {
+        const parsed = JSON.parse(auto);
+        if (parsed.lyrics && parsed.lyrics.trim()) {
+          setTitle(parsed.title || '');
+          setTheme(parsed.theme || '');
+          setGenre(parsed.genre || 'Alternative Rock');
+          setMood(parsed.mood || 'Emotional & Melancholic');
+          setComplexity(parsed.complexity || 'Metaphoric & Deep');
+          setLyrics(parsed.lyrics);
+          setSavedAt(parsed.updatedAt || null);
+          setSaveState('saved');
+          restored = true;
+        }
+      }
+    } catch (err) {
+      console.error('Error loading autosaved lyrics', err);
+    }
 
     // Default sample if empty
-    if (!lyrics) {
+    if (!restored && !lyrics) {
       setLyrics(`[Verse 1]\nI'm staring through a fractured glass again\nThe shadows outline paths of quiet pain\nOur heavy hearts they carry what remains\nUntil the silence washes out the stains\n\n[Chorus]\nIt hurts like hell to let you go\nInto the drafty, silent snow\nAnd hear the echo of a song\nWe tried to play, we got it wrong\n\n[Bridge]\nBut does the fire still burn inside your mind?\nOr is it ash, the kind we left behind?`);
       setTitle('Hurts Like Hell');
     }
   }, []);
+
+  // Real autosave: debounce the working draft to localStorage and show
+  // a visible Saved indicator. Fires on every edit (title/theme/lyrics).
+  useEffect(() => {
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    setSaveState('saving');
+    autosaveTimerRef.current = setTimeout(() => {
+      try {
+        const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({
+          title, theme, genre, mood, complexity, lyrics, updatedAt: stamp,
+        }));
+        setSavedAt(stamp);
+        setSaveState('saved');
+      } catch (err) {
+        console.error('Autosave failed', err);
+        setSaveState('idle');
+      }
+    }, 900);
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, theme, genre, mood, complexity, lyrics]);
 
   const showNotification = (msg: string) => {
     setStatusMessage(msg);
@@ -142,16 +241,21 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
     showNotification('Applied song template');
   };
 
-  // Generate full lyrics with AI
+  // Generate full lyrics with AI (in the active Lyricist's voice, if one is picked)
   const handleGenerateFullLyrics = async () => {
     if (!theme.trim()) {
       alert('Please describe what your song is about (theme or story).');
       return;
     }
     setIsGenerating(true);
-    setStatusMessage('Neural songwriter drafting complete song...');
+    const activeLyricist = lyricists.find(l => l.id === activeLyricistId) || null;
+    setStatusMessage(activeLyricist
+      ? `Neural songwriter drafting in the voice of "${activeLyricist.name}"...`
+      : 'Neural songwriter drafting complete song...');
     try {
-      const generated = await suggestLyricsChujai(theme, genre, complexity, mood);
+      const generated = activeLyricist
+        ? await generateLyricsWithLyricist(theme, genre, complexity, mood, undefined, { name: activeLyricist.name, examples: activeLyricist.examples })
+        : await suggestLyricsChujai(theme, genre, complexity, mood);
       setLyrics(generated);
       if (!title.trim()) {
         const autoTitle = theme.split(' ').slice(0, 4).join(' ').replace(/[^a-zA-Z0-9 ]/g, '');
@@ -165,6 +269,107 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  // --- Lyricists: save the current lyrics as a named voice, pick, delete ---
+  const handleSaveLyricist = () => {
+    const name = newLyricistName.trim() || title.trim() || 'My Lyricist';
+    if (!lyrics.trim()) {
+      alert('Write or generate some lyrics first — a Lyricist needs example lyrics to learn your voice.');
+      return;
+    }
+    const entry: Lyricist = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      examples: lyrics,
+      createdAt: new Date().toLocaleDateString(),
+    };
+    const updated = [entry, ...lyricists];
+    setLyricists(updated);
+    localStorage.setItem(LYRICISTS_KEY, JSON.stringify(updated));
+    setActiveLyricistId(entry.id);
+    setNewLyricistName('');
+    showNotification(`🎭 Lyricist "${name}" saved — new lyrics will match this voice.`);
+  };
+
+  const handleDeleteLyricist = (id: string) => {
+    const updated = lyricists.filter(l => l.id !== id);
+    setLyricists(updated);
+    localStorage.setItem(LYRICISTS_KEY, JSON.stringify(updated));
+    if (activeLyricistId === id) setActiveLyricistId(null);
+    showNotification('Lyricist removed');
+  };
+
+  // --- Natural-language editing: free-text instruction, whole song or selection ---
+  const handleNaturalLanguageEdit = async () => {
+    if (!nlInstruction.trim()) {
+      alert('Tell the AI what to change — e.g. "make this line funnier" or "give this a more offbeat rhyme scheme".');
+      return;
+    }
+    if (!lyrics.trim()) {
+      alert('Write or generate lyrics first to edit them.');
+      return;
+    }
+    const ta = textareaRef.current;
+    const selStart = ta ? ta.selectionStart ?? 0 : 0;
+    const selEnd = ta ? ta.selectionEnd ?? 0 : 0;
+    const hasSelection = nlScope === 'selection' && selEnd > selStart;
+    if (nlScope === 'selection' && !hasSelection) {
+      alert('Highlight a line (or a few lines) in the editor first, or switch the scope to "Whole song".');
+      return;
+    }
+    const target = hasSelection ? lyrics.slice(selStart, selEnd) : lyrics;
+    setIsNlEditing(true);
+    setStatusMessage(hasSelection ? 'AI editing your highlighted lines…' : 'AI editing your lyrics…');
+    try {
+      const edited = await polishLyricsWithAI(target, nlInstruction, genre);
+      if (hasSelection) {
+        setLyrics(lyrics.slice(0, selStart) + edited.trim() + lyrics.slice(selEnd));
+      } else {
+        setLyrics(edited);
+      }
+      showNotification('✨ Lyrics edited the way you asked!');
+    } catch (err) {
+      alert('Editing failed. Please try again.');
+    } finally {
+      setIsNlEditing(false);
+    }
+  };
+
+  // --- Highlight a word/line → rhymes & inspiration for exactly that text ---
+  const handleRhymeForSelection = async () => {
+    const ta = textareaRef.current;
+    let term = '';
+    if (ta && ta.selectionEnd > ta.selectionStart) {
+      term = lyrics.slice(ta.selectionStart, ta.selectionEnd).trim();
+    } else if (ta) {
+      // No selection: use the word at the cursor.
+      const pos = ta.selectionStart ?? 0;
+      const before = lyrics.slice(0, pos);
+      const after = lyrics.slice(pos);
+      const wordBefore = (before.match(/[A-Za-z']+$/) || [''])[0];
+      const wordAfter = (after.match(/^[A-Za-z']+/) || [''])[0];
+      term = `${wordBefore}${wordAfter}`.trim();
+    }
+    if (!term) {
+      alert('Highlight a word or a line in the editor first, or place your cursor on a word.');
+      return;
+    }
+    setRhymeQuery(term);
+    setActiveTab('rhymes');
+    await handleSearchRhymes(term);
+  };
+
+  // Jump the editor to a structure section (click a chip in the structure bar)
+  const jumpToSection = (start: number) => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.focus();
+    ta.setSelectionRange(start, start);
+    // Scroll so the section's line is visible.
+    const lineHeight = 20;
+    const line = lyrics.slice(0, start).split('\n').length;
+    ta.scrollTop = Math.max(0, (line - 3) * lineHeight);
   };
 
   // Co-write / Continue with AI
@@ -323,9 +528,9 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
               </h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-[11px] text-zinc-400 font-medium">Write custom song lyrics manually or co-write seamlessly with Gemini AI</p>
-                <div className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/40 border border-orange-500/25 px-2 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
-                  <span>Auto-Save Active</span>
+                <div className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-orange-400 bg-orange-950/40 border border-orange-500/25 px-2 py-0.5 rounded-full" title="Your working draft autosaves to this browser as you write.">
+                  <span className={`w-1.5 h-1.5 rounded-full ${saveState === 'saving' ? 'bg-orange-400 animate-pulse' : 'bg-emerald-400'}`}></span>
+                  <span>{saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? `Autosaved${savedAt ? ` ${savedAt}` : ''}` : 'Autosave on'}</span>
                 </div>
               </div>
             </div>
@@ -371,7 +576,9 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
 
       {/* Main Studio Viewport */}
       {activeTab === 'writer' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in duration-300">
+        <div className={isFullscreen
+          ? 'fixed inset-0 z-50 bg-[#0a0a0b] overflow-y-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in duration-300'
+          : 'grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in duration-300'}>
           
           {/* LEFT: Quick Song Info & AI Assistant Tools */}
           <div className="lg:col-span-4 space-y-5">
@@ -494,6 +701,41 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
                   </button>
                 </div>
               </div>
+
+              {/* Natural-language editing: talk to the AI like a collaborator */}
+              <div className="pt-2 border-t border-white/5 space-y-2">
+                <label className="text-[9px] font-black uppercase tracking-wider text-zinc-500 block">Talk to the AI — Edit in Plain Words</label>
+                <p className="text-[10px] text-zinc-500 leading-snug">Ask for what you want, like you would a co-writer — e.g. "make this line funnier" or "give this a more offbeat rhyme scheme".</p>
+                <input
+                  type="text"
+                  value={nlInstruction}
+                  onChange={(e) => setNlInstruction(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') void handleNaturalLanguageEdit(); }}
+                  placeholder='e.g. make this line funnier'
+                  className="w-full bg-[#1a1a1e]/80 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-orange-500/50"
+                />
+                <div className="flex gap-1.5">
+                  {(['all', 'selection'] as const).map(scope => (
+                    <button
+                      key={scope}
+                      onClick={() => setNlScope(scope)}
+                      className={`flex-1 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                        nlScope === scope ? 'bg-orange-500/15 border border-orange-500/40 text-orange-400' : 'bg-[#1a1a1e] border border-white/5 text-zinc-400 hover:text-white'
+                      }`}
+                      title={scope === 'selection' ? 'Edit only the text you highlighted in the editor' : 'Edit the whole song'}
+                    >
+                      {scope === 'all' ? 'Whole song' : 'Highlighted text'}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => void handleNaturalLanguageEdit()}
+                    disabled={isNlEditing}
+                    className="flex-1 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-600 text-white text-[9px] font-black uppercase tracking-wider transition-all disabled:opacity-50"
+                  >
+                    {isNlEditing ? 'Editing…' : 'Apply Edit'}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Quick Song Structure Templates */}
@@ -539,6 +781,21 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
 
                 {/* Quick actions */}
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => void handleRhymeForSelection()}
+                    disabled={isLookingUpRhymes}
+                    className="px-3 py-1 rounded-lg bg-[#1a1a1e] hover:bg-white/10 text-orange-400 text-[10px] font-black uppercase transition-colors disabled:opacity-50"
+                    title="Highlight a word or a line in the editor, then get rhymes and next-line ideas for exactly that text"
+                  >
+                    🎯 Rhymes for Selection
+                  </button>
+                  <button
+                    onClick={() => setIsFullscreen(!isFullscreen)}
+                    className="px-3 py-1 rounded-lg bg-[#1a1a1e] hover:bg-white/10 text-zinc-300 text-[10px] font-black uppercase transition-colors"
+                    title={isFullscreen ? 'Exit full-screen editor' : 'Full-screen, distraction-free editor'}
+                  >
+                    {isFullscreen ? '⤢ Exit Full Screen' : '⛶ Full Screen'}
+                  </button>
                   <button 
                     onClick={() => {
                       if (window.confirm('Clear all lyrics?')) {
@@ -562,13 +819,36 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
                 </div>
               </div>
 
+              {/* Song structure bar: live labels parsed from the lyrics — click to jump */}
+              {(() => {
+                const sections = parseLyricSections(lyrics);
+                if (sections.length === 0) return null;
+                return (
+                  <div className="mt-4 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 mr-1">Structure:</span>
+                    {sections.map((sec, i) => (
+                      <button
+                        key={`${sec.label}-${i}`}
+                        onClick={() => jumpToSection(sec.start)}
+                        className="px-2 py-1 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/25 text-orange-300 text-[9px] font-black tracking-wider transition-all"
+                        title={`Jump to ${sec.label} (line ${sec.line})`}
+                      >
+                        {sec.label}
+                      </button>
+                    ))}
+                    <span className="text-[9px] text-zinc-600 ml-1">Click a label to jump to it · insert tags above to add sections</span>
+                  </div>
+                );
+              })()}
+
               {/* Main Lyrics Textarea with line-number feel */}
               <div className="relative flex-1 my-4 flex">
                 <textarea 
+                  ref={textareaRef}
                   value={lyrics}
                   onChange={(e) => setLyrics(e.target.value)}
                   placeholder="Type your lyrics here, or use the AI Songwriter / Co-Writer to compose stanzas..."
-                  className="w-full h-full min-h-[440px] bg-[#131316]/60 border border-white/5 hover:border-white/10 focus:border-orange-500/50 rounded-2xl p-6 font-mono text-xs leading-relaxed text-zinc-200 placeholder-zinc-600 focus:outline-none custom-scrollbar resize-none font-medium"
+                  className={`w-full h-full bg-[#131316]/60 border border-white/5 hover:border-white/10 focus:border-orange-500/50 rounded-2xl p-6 font-mono text-xs leading-relaxed text-zinc-200 placeholder-zinc-600 focus:outline-none custom-scrollbar resize-none font-medium ${isFullscreen ? 'min-h-[70vh]' : 'min-h-[440px]'}`}
                 />
               </div>
 
@@ -582,6 +862,9 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider" title="Your working draft saves to this browser automatically as you write — nothing gets lost.">
+                    {saveState === 'saving' ? '● Saving…' : saveState === 'saved' ? `● Autosaved${savedAt ? ` ${savedAt}` : ''}` : '● Autosave on'}
+                  </span>
                   <span className="text-[9px] text-orange-400 font-black uppercase tracking-wider">● Studio Ready</span>
                 </div>
               </div>
@@ -708,6 +991,49 @@ const LyricsChujaiView: React.FC<LyricsChujaiViewProps> = ({ onNavigate, onSendT
                   placeholder="e.g. Ten Years in the Rain"
                   className="w-full bg-[#1a1a1e]/70 border border-white/10 rounded-xl p-3 text-xs font-bold text-white focus:outline-none focus:border-orange-500/50"
                 />
+              </div>
+
+              {/* Lyricist: save your lyric examples as a voice, then generate in that voice */}
+              <div className="rounded-2xl border border-orange-500/20 bg-orange-950/10 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-orange-300">🎭 Lyricist — Your Voice</label>
+                  {activeLyricistId && (
+                    <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Active</span>
+                  )}
+                </div>
+                <p className="text-[10px] text-zinc-400 leading-snug">Save examples of your lyrics as a named Lyricist. New lyrics will be written in the same vibe — same vocabulary, imagery, and rhyme habits. Examples stay in this browser.</p>
+                {lyricists.length > 0 && (
+                  <div className="space-y-1.5">
+                    {lyricists.map(l => (
+                      <div key={l.id} className={`flex items-center gap-2 p-2 rounded-xl border transition-all ${activeLyricistId === l.id ? 'bg-orange-500/15 border-orange-500/40' : 'bg-[#1a1a1e]/60 border-white/5'}`}>
+                        <button onClick={() => setActiveLyricistId(activeLyricistId === l.id ? null : l.id)} className="flex-1 text-left min-w-0">
+                          <span className="block text-[11px] font-black text-white truncate">{l.name}</span>
+                          <span className="block text-[9px] text-zinc-500 truncate">{l.examples.split('\n').filter(Boolean).slice(0, 2).join(' · ')}</span>
+                        </button>
+                        <button onClick={() => handleDeleteLyricist(l.id)} className="text-zinc-500 hover:text-red-400 text-xs px-1" title="Delete this Lyricist">🗑</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newLyricistName}
+                    onChange={(e) => setNewLyricistName(e.target.value)}
+                    placeholder="Name your Lyricist (e.g. Midnight Poet)"
+                    className="flex-1 bg-[#1a1a1e]/80 border border-white/10 rounded-xl px-3 py-2 text-[11px] text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-orange-500/50"
+                  />
+                  <button
+                    onClick={handleSaveLyricist}
+                    className="px-3 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 text-white text-[9px] font-black uppercase tracking-wider transition-all whitespace-nowrap"
+                    title="Save your current lyrics as a Lyricist voice"
+                  >
+                    Save from Current Lyrics
+                  </button>
+                </div>
+                {activeLyricistId && (
+                  <p className="text-[10px] text-emerald-400 font-semibold">Generating in the voice of "{lyricists.find(l => l.id === activeLyricistId)?.name}". Tap it again to turn off.</p>
+                )}
               </div>
 
               <button 
